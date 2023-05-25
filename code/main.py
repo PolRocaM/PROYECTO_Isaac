@@ -1,38 +1,65 @@
 import pygame
 import os
-from mapa import Mapa
+import math
 from Personaje import Personaje
 from settings import Settings
 from Proyectil import Proyectil
 from pygame.sprite import Group
-from enemigos import Enemigo
-
+from enemigos import Enemy
+from enemigos2 import Enemigo
+from mapa import Mapa
+import random
 
 # Inicializar
 pygame.init()
 
 def run_game():
+    # Crea el objeto del mapa
+    matriz = [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ]
+    matriz2 = [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ]
+    #mapa = Mapa(matriz)
     ai_settings = Settings()
     ventana = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
+    # Titulo ventana
     pygame.display.set_caption("Proyecto PRE")
     imagen_pj = pygame.image.load('personaje_d.png')
     imagen_enemigo = pygame.image.load('enemigo_2.png')
+    speed = 5
 
     #crear personaje
     personaje = Personaje(ai_settings, ventana, imagen_pj)
+    #sprites.add(personaje)
     #creamos proyectiles
-    proyectil = Group()
+    proyectil = pygame.sprite.Group()
+
     #creamos enemigos
+    #enemigo = Enemy(800, 100, mapa)
+
+    enemigos = pygame.sprite.Group()
     enemigo1 = Enemigo(ai_settings, ventana, imagen_enemigo)
-    #enemigo1 = Group()
+    enemigos.add(enemigo1)
 
-    #reloj = pygame.time.Clock()
-
-    #dibujar mapa
-    mapa_partida = Mapa()
-    #muros = mapa_partida.construir_mapa(ventana)
-
+    fps = 60
+    reloj = pygame.time.Clock()
     jugando = True
+
     while jugando:
 
         #reloj.tick(60)
@@ -41,18 +68,16 @@ def run_game():
         #actualizamos accion del personaje
         personaje.update()
         #actualizamos proyectiles
-        proyectil.update()
+        Proyectil.update_bullets(proyectil, ai_settings, enemigos)
         #actualizamos enemigos
-        enemigo1.update()
-
-        #dibujar mapa
-        #mapa_partida.construir_mapa(ventana)
+        #enemigo.update(personaje, speed)
+        Enemigo.update_enemigos(ai_settings, ventana, enemigos, proyectil)
+        Enemigo.update_vida(enemigos, ai_settings, proyectil)
 
         #actualizar ventana
         ventana.fill(ai_settings.bg_color)
-
-        #construir mapa
-        #mapa.construir_mapa(ventana)
+        #mapa.sprites.draw(ventana)
+        #enemigo.draw_barra_vida_enemigo(ventana)
 
         #redibujar proyectiles
         for bullet in proyectil.sprites():
@@ -61,13 +86,12 @@ def run_game():
         # dibujar personaje
         personaje.blitme()
         # dibujar enemigo
-        enemigo1.blitme()
+        enemigos.draw(ventana)
 
         pygame.display.update()
-
+        #reloj.tick(fps)
         # Make the most recently drawn screen visible.
         #pygame.display.flip()
-
 
 run_game()
 

@@ -1,9 +1,11 @@
 import pygame
 import sys
+import math
 import mapa
 from Proyectil import *
+from pygame.sprite import Sprite
 
-class Personaje:
+class Personaje(Sprite):
     pos_ini_x = 0
     pos_ini_y = 0
     x_pixels = 51
@@ -130,5 +132,9 @@ class Personaje:
             elif event.type == pygame.KEYUP:
                 Personaje.check_keyup_events(event, personaje)
 
-
-
+    def check_enemy_collision(self, player_x, player_y, enemy_x, enemy_y, enemy_radius):
+        distance = math.sqrt((player_x - enemy_x) ** 2 + (player_y - enemy_y) ** 2)
+        if distance <= enemy_radius:
+            return True
+        else:
+            return False
