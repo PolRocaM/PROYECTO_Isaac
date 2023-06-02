@@ -1,11 +1,6 @@
 import random
-
 import pygame
-import os
-import sys
 from pygame.sprite import Sprite
-
-
 
 class Enemigo(Sprite):
     def __init__(self, ai_settings, ventana, imagen):
@@ -29,14 +24,19 @@ class Enemigo(Sprite):
 
         self.dir = -1
         self.dir2 = -1
+        self.dir3 = 1
 
         #guardar numero float del centro del enemigo
         self.centerx = float(self.rect.centerx)
         self.centery = float(self.rect.centery)
 
-        self.vida = 10
+        self.health_font = pygame.font.SysFont('Roboto', 18)
+        self.vida = 100
+        self.vida_barra = pygame.Surface((self.vida*45/100, 5))
+        self.vida_barra.fill((255, 0, 0))
 
-    def update(self):
+    def update(self, personaje, enemigo, ai_settings):
+        #moviment enemigo
         self.centerx += self.ai_settings.enemigo_speed_factor*self.dir
         self.rect.centerx = self.centerx
         self.centery += self.ai_settings.enemigo_speed_factor*self.dir2
@@ -52,27 +52,28 @@ class Enemigo(Sprite):
         if self.rect.top < 0:
             self.dir2 = 1.0
 
+    def update_vida(self, enemigo, ai_settings, proyectil, enemigos):
+
+        colisiones = pygame.sprite.groupcollide(enemigos, proyectil, False, True)
+        for enemigos,proyectiles in colisiones.items():
+            print (enemigos, proyectiles)
+            for i in proyectiles:
+                enemigos.vida -= ai_settings.proyectil_dmg
+                if enemigos.vida <= 0:
+                    enemigos.vida = 0
+                    enemigos.kill()
+
+    def draw_barra_vida_enemigo(self):
+        # Dibuja la barra de vida
+        vida_rect = pygame.Rect(0, 0, self.vida, 5)
+        pygame.draw.rect(self.vida_barra, (255, 0, 0), vida_rect)
+        self.ventana.blit(self.vida_barra, (self.rect.left, self.rect.bottom+3))
+
+    def update_barra_vida(enemigo):
+        enemigo.vida = enemigo.vida
+        enemigo.vida_barra = pygame.Surface((enemigo.vida*45/100, 5))
+        enemigo.draw_barra_vida_enemigo()
 
 
-    # def blitme(self):
-    #     #dibuja enemigo en su pos actual
-    #     self.ventana.blit(self.image, self.rect)
-
-    def draw_enemigo(self):
-        pygame.draw.rect(self.ventana, self.image, self.rect)
-
-    def update_vida(enemigos, ai_settings, proyectil):
-        #enemigo.update()
-        colision = pygame.sprite.groupcollide(enemigos, proyectil, True, True)
-
-        # for col in colision:
-        #     enemigos.vida -= ai_settings.proyectil_dmg
-        #
-        # if enemigos.vida <= 0:
-        #     enemigos.kill()
-
-    def update_enemigos(ai_settings, ventana, enemigo, proyectil):
-
-        enemigo.update()
-        #enemigo.update_vida(enemigo, ai_settings, proyectil)
-        # if pygame.sprite.spritecollideany(enemigo, proyectil):
+    # def update_enemigos(enemigos, personaje, ai_settings):
+    #     enemigos.update(personaje, enemigos, ai_settings)

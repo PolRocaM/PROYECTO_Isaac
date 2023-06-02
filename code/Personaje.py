@@ -1,21 +1,12 @@
 import pygame
 import sys
-import math
-import mapa
 from Proyectil import *
 from pygame.sprite import Sprite
 
 class Personaje(Sprite):
-    pos_ini_x = 0
-    pos_ini_y = 0
-    x_pixels = 51
-    y_pixels = 87
-
-    vida = 100
-    damage = 1
-    speed = 0
 
     def __init__(self, ai_settings, ventana, imagen):
+        super(Personaje,self).__init__()
         self.ventana = ventana
         self.ai_settings = ai_settings
 
@@ -38,18 +29,26 @@ class Personaje(Sprite):
         self.moving_up = False
         self.moving_down = False
 
-        # self.proyectil_up = False
-        # self.proyectil_down = False
-        # self.proyectil_right = False
-        # self.proyectil_left = False
+        #barra de vida
+        self.largo = 200
+        self.ancho = 25
+        self.health_font = pygame.font.SysFont('Roboto', 18)
+        self.vida = 100
+        #barra de vida total
+        self.vida_barra_max = pygame.Surface((self.largo, self.ancho))
+        self.vida_barra_max.fill((0, 0, 0))
+        #barra de vida actual
+        self.vida_barra = pygame.Surface((int((self.vida/100)*self.largo), self.ancho))
+        self.vida_barra.fill((125, 125, 125))
 
+        self.proyectil_up = False
+        self.proyectil_down = False
+        self.proyectil_right = False
+        self.proyectil_left = False
+        self.cadencia = 250
+        self.ultimo_disparo = pygame.time.get_ticks()
 
-    # def crear_pj(self, pos_ini_x, pos_ini_y, x_pixels, y_pixels, imagen):
-    #     personaje = pygame.Rect(pos_ini_x, pos_ini_y, x_pixels, y_pixels)  # pos inicial 640,360, tamany pj 68x104 pixels (tamany sprite)
-    #     imagen.pygame.image.load('personaje_d.png')
-    #     return personaje
-
-    def update(self):
+    def update(self, enemigos, ai_settings, ventana, personaje, proyectil):
         # Update the personaje's center value, not the rect.
         #mover personaje DERECHA
         if self.moving_right and self.rect.right < self.screen_rect.right:
@@ -68,20 +67,55 @@ class Personaje(Sprite):
             self.centery -= self.ai_settings.personaje_speed_factor
             self.image = pygame.image.load('personaje_u.png')
 
-        # png UP cuando disparo proyectil
-        # if self.moving_up == True:
-        #     self.image = pygame.image.load('personaje_u.png')
-        # if self.moving_down == True:
-        #     self.image = pygame.image.load('personaje_d.png')
-        # if self.moving_right == True:
-        #     self.image = pygame.image.load('personaje_r.png')
-        # if self.moving_left == True:
-        #     self.image = pygame.image.load('personaje_l.png')
-
         # Update rect object from self.center.
         self.rect.centerx = self.centerx
         self.rect.centery = self.centery
 
+        #mantener para disparar
+        if self.proyectil_up:
+            self.image = pygame.image.load('personaje_u.png')
+            ahora = pygame.time.get_ticks()
+            if ahora-self.ultimo_disparo > self.cadencia:
+                Proyectil.fire_bullet(ai_settings, ventana, personaje, proyectil, pygame.K_UP)
+                self.ultimo_disparo = ahora
+        elif self.proyectil_down:
+            self.image = pygame.image.load('personaje_d.png')
+            ahora = pygame.time.get_ticks()
+            if ahora - self.ultimo_disparo > self.cadencia:
+                Proyectil.fire_bullet(ai_settings, ventana, personaje, proyectil, pygame.K_DOWN)
+                self.ultimo_disparo = ahora
+        elif self.proyectil_left:
+            self.image = pygame.image.load('personaje_l.png')
+            ahora = pygame.time.get_ticks()
+            if ahora - self.ultimo_disparo > self.cadencia:
+                Proyectil.fire_bullet(ai_settings, ventana, personaje, proyectil, pygame.K_LEFT)
+                self.ultimo_disparo = ahora
+        elif self.proyectil_right:
+            self.image = pygame.image.load('personaje_r.png')
+            ahora = pygame.time.get_ticks()
+            if ahora - self.ultimo_disparo > self.cadencia:
+                Proyectil.fire_bullet(ai_settings, ventana, personaje, proyectil, pygame.K_RIGHT)
+                self.ultimo_disparo = ahora
+
+        self.check_col_enemigo(enemigos)
+
+    def check_col_enemigo(self, enemigos):
+        colision_enemigo = pygame.sprite.spritecollide(self, enemigos, False)
+        # actualizamos vida personaje
+        if colision_enemigo:
+            self.vida -= 0.25
+            if self.vida <= 0:
+                self.vida = 0
+                self.kill()
+
+    def draw_barra_vida(self, vida):
+        calculo_largo = int((vida/100)*self.largo)
+        self.vida_barra = pygame.Surface((calculo_largo, self.ancho))
+        borde = pygame.Rect(0, 0, self.largo, self.ancho)
+        rectangulo = pygame.Rect(0, 0, calculo_largo, self.ancho)
+        pygame.draw.rect(self.vida_barra_max, (0, 0, 0), borde)
+        pygame.draw.rect(self.vida_barra, (0, 255, 0), rectangulo)
+        self.ventana.blit(self.vida_barra, (self.screen_rect.left+20, self.screen_rect.top+20))
     def blitme(self):
         #dibuja el personaje en su localización actual
         self.ventana.blit(self.image, self.rect)
@@ -98,18 +132,13 @@ class Personaje(Sprite):
             personaje.moving_down = True
 
         if event.key == pygame.K_UP:
-            Proyectil.fire_bullet(ai_settings, screen, personaje, proyectil, pygame.K_UP)
-            #personaje.proyectil_up = True
-        elif event.key == pygame.K_DOWN:
-            Proyectil.fire_bullet(ai_settings, screen, personaje, proyectil, pygame.K_DOWN)
-            #personaje.proyectil_down = True
-        elif event.key == pygame.K_LEFT:
-            Proyectil.fire_bullet(ai_settings, screen, personaje, proyectil, pygame.K_LEFT)
-            #personaje.proyectil_left = True
-        elif event.key == pygame.K_RIGHT:
-            Proyectil.fire_bullet(ai_settings, screen, personaje, proyectil, pygame.K_RIGHT)
-            #personaje.moving_right = True
-
+            personaje.proyectil_up = True
+        if event.key == pygame.K_DOWN:
+            personaje.proyectil_down = True
+        if event.key == pygame.K_LEFT:
+            personaje.proyectil_left = True
+        if event.key == pygame.K_RIGHT:
+            personaje.proyectil_right = True
 
     def check_keyup_events(event, personaje):
         """Respond to key releases."""
@@ -121,6 +150,14 @@ class Personaje(Sprite):
             personaje.moving_up = False
         elif event.key == pygame.K_s:
             personaje.moving_down = False
+        if event.key == pygame.K_UP:
+            personaje.proyectil_up = False
+        elif event.key == pygame.K_DOWN:
+            personaje.proyectil_down = False
+        if event.key == pygame.K_LEFT:
+            personaje.proyectil_left = False
+        if event.key == pygame.K_RIGHT:
+            personaje.proyectil_right = False
 
     def check_events(ai_settings, ventana, personaje, proyectil):
         """Respond to keypresses events."""
@@ -131,10 +168,3 @@ class Personaje(Sprite):
                 Personaje.check_keydown_events(event, ai_settings, ventana, personaje, proyectil)
             elif event.type == pygame.KEYUP:
                 Personaje.check_keyup_events(event, personaje)
-
-    def check_enemy_collision(self, player_x, player_y, enemy_x, enemy_y, enemy_radius):
-        distance = math.sqrt((player_x - enemy_x) ** 2 + (player_y - enemy_y) ** 2)
-        if distance <= enemy_radius:
-            return True
-        else:
-            return False

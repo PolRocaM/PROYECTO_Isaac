@@ -11,7 +11,6 @@ class Proyectil(Sprite):
         self.rect.centerx = personaje.rect.centerx
         self.rect.centery = personaje.rect.centery
 
-
         # Store a decimal value for the bullet's position.
         self.y = float(self.rect.y)
         self.x = float(self.rect.x)
@@ -20,8 +19,6 @@ class Proyectil(Sprite):
         self.speed_factor = ai_settings.proyectil_speed_factor
 
         self.direccion = direccion
-
-
 
     def update(self):
 
@@ -57,21 +54,14 @@ class Proyectil(Sprite):
         """Fire a bullet, if limit not reached yet."""
         # Create a new bullet, add to bullets group.
 
-        if len(proyectil) < ai_settings.bullets_allowed: #EL if es per limitar les bales
+        if len(proyectil) < ai_settings.bullets_allowed: #limitar les bales
             new_bullet = Proyectil(ai_settings, ventana, personaje, direccion)
             proyectil.add(new_bullet)
 
-    def update_bullets(proyectil, ai_settings, enemigos):
+    def update_bullets(proyectil, ai_settings):
         """Update position of bullets, and get rid of old bullets."""
         # Update bullet positions.
         proyectil.update()
-        colisiones = pygame.sprite.groupcollide(enemigos, proyectil, False, True)
-
-        for col in colisiones:
-            print(type(col))
-            print(type(colisiones[col][0]))
-            proyectil.remove(col)
-
         #Borrar balas que se van de la pantalla
         for bullet in proyectil:
             if bullet.rect.bottom <= 0 or bullet.rect.top >= ai_settings.screen_height or bullet.rect.right <= 0 or bullet.rect.left >= ai_settings.screen_width:
