@@ -3,14 +3,13 @@ import pygame
 from pygame.sprite import Sprite
 
 class Enemigo(Sprite):
-    def __init__(self, ai_settings, ventana, imagen):
+    def __init__(self, ai_settings, ventana):
         super(Enemigo, self).__init__()
         self.ventana = ventana
         self.ai_settings = ai_settings
-        self.remove()
 
         #imagen Enemigo
-        self.image = imagen
+        self.image = pygame.image.load('enemigo_2.png')
 
         #rect enemigo
         self.rect = self.image.get_rect()
@@ -22,20 +21,20 @@ class Enemigo(Sprite):
         self.rect.centerx = self.centerx
         self.rect.centery = self.centery
 
-        self.dir = -1
-        self.dir2 = -1
-        self.dir3 = 1
+        self.dir = -1 #parametro para cambiar la dirección x
+        self.dir2 = -1 #parametro para cambiar la dirección y
 
         #guardar numero float del centro del enemigo
         self.centerx = float(self.rect.centerx)
         self.centery = float(self.rect.centery)
 
+        #parametros vida enemigo
         self.health_font = pygame.font.SysFont('Roboto', 18)
         self.vida = 100
         self.vida_barra = pygame.Surface((self.vida*45/100, 5))
         self.vida_barra.fill((255, 0, 0))
 
-    def update(self, personaje, enemigo, ai_settings):
+    def update(self, personaje, enemigos, ai_settings):
         #moviment enemigo
         self.centerx += self.ai_settings.enemigo_speed_factor*self.dir
         self.rect.centerx = self.centerx
@@ -51,12 +50,19 @@ class Enemigo(Sprite):
             self.dir2 = -1.0
         if self.rect.top < 0:
             self.dir2 = 1.0
+        # if self.rect == personaje.rect.centery-25:
+        #     self.dir2 = self.dir2 *-1
+        # if self.rect == (personaje.rect.centerx)-25:
+        #     self.dir = self.dir*-1
+        # self.centery = self.centery
+        # self.centerx = self.centerx
 
-    def update_vida(self, enemigo, ai_settings, proyectil, enemigos):
+
+    def update_vida(self, ai_settings, proyectil, enemigos):
 
         colisiones = pygame.sprite.groupcollide(enemigos, proyectil, False, True)
         for enemigos,proyectiles in colisiones.items():
-            print (enemigos, proyectiles)
+            # print (enemigos, proyectiles)
             for i in proyectiles:
                 enemigos.vida -= ai_settings.proyectil_dmg
                 if enemigos.vida <= 0:

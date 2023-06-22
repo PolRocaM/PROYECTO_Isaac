@@ -3,15 +3,15 @@ import sys
 from Proyectil import *
 from pygame.sprite import Sprite
 
-class Personaje(Sprite):
+class Personaje(pygame.sprite.Sprite):
 
-    def __init__(self, ai_settings, ventana, imagen):
-        super(Personaje,self).__init__()
+    def __init__(self, ai_settings, ventana,):
+        super(Personaje, self).__init__()
         self.ventana = ventana
         self.ai_settings = ai_settings
 
         #imagen del personaje y su rect
-        self.image = imagen
+        self.image = pygame.image.load('personaje_d.png')
         self.rect = self.image.get_rect()
         self.screen_rect = ventana.get_rect()
 
@@ -45,7 +45,7 @@ class Personaje(Sprite):
         self.proyectil_down = False
         self.proyectil_right = False
         self.proyectil_left = False
-        self.cadencia = 250
+        self.cadencia = 500
         self.ultimo_disparo = pygame.time.get_ticks()
 
     def update(self, enemigos, ai_settings, ventana, personaje, proyectil):
@@ -120,7 +120,7 @@ class Personaje(Sprite):
         #dibuja el personaje en su localización actual
         self.ventana.blit(self.image, self.rect)
 
-    def check_keydown_events(event, ai_settings, screen, personaje, proyectil):
+    def check_keydown_events(event, personaje):
         """Respond to keypresses."""
         if event.key == pygame.K_d:
             personaje.moving_right = True
@@ -130,7 +130,7 @@ class Personaje(Sprite):
             personaje.moving_up = True
         elif event.key == pygame.K_s:
             personaje.moving_down = True
-
+        #
         if event.key == pygame.K_UP:
             personaje.proyectil_up = True
         if event.key == pygame.K_DOWN:
@@ -159,12 +159,12 @@ class Personaje(Sprite):
         if event.key == pygame.K_RIGHT:
             personaje.proyectil_right = False
 
-    def check_events(ai_settings, ventana, personaje, proyectil):
+    def check_events(ai_settings, personaje):
         """Respond to keypresses events."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
-                Personaje.check_keydown_events(event, ai_settings, ventana, personaje, proyectil)
+                Personaje.check_keydown_events(event, personaje)
             elif event.type == pygame.KEYUP:
                 Personaje.check_keyup_events(event, personaje)

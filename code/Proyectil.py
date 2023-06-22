@@ -1,13 +1,15 @@
 import pygame
 from pygame.sprite import Sprite
-
+from Tiles import Tile
 class Proyectil(Sprite):
     def __init__(self, ai_settings, ventana, personaje, direccion):
         super(Proyectil, self).__init__()
         self.ventana = ventana
+        self.image = pygame.image.load("bullet.png")
 
         # Create bullet rect at (0, 0), then set correct position.
-        self.rect = pygame.Rect(0, 0, ai_settings.proyectil_width, ai_settings.proyectil_height)
+        self.rect = self.image.get_rect()
+        # self.rect = pygame.Rect(0, 0, ai_settings.proyectil_width, ai_settings.proyectil_height)
         self.rect.centerx = personaje.rect.centerx
         self.rect.centery = personaje.rect.centery
 
@@ -22,25 +24,28 @@ class Proyectil(Sprite):
 
     def update(self):
 
-        #self.update_bullets()
-
         #Mover el proyectil
         if self.direccion == pygame.K_UP:
+            self.image = pygame.image.load("bullet_u.png")
             # Update the decimal position of the bullet (UP).
             self.y -= self.speed_factor
             # Update the rect position.
             self.rect.y = self.y
         elif self.direccion == pygame.K_DOWN:
+            self.image = pygame.image.load("bullet_d.png")
             # Update the decimal position of the bullet (DOWN).
             self.y += self.speed_factor
             # Update the rect position.
             self.rect.y = self.y
         elif self.direccion == pygame.K_RIGHT:
+            self.image = pygame.image.load("bullet_r.png")
             # Update the decimal position of the bullet (RIGHT).
             self.x += self.speed_factor
             # Update the rect position.
             self.rect.x = self.x
+
         elif self.direccion == pygame.K_LEFT:
+            self.image = pygame.image.load("bullet_l.png")
             # Update the decimal position of the bullet (LEFT).
             self.x -= self.speed_factor
             # Update the rect position.
@@ -50,6 +55,7 @@ class Proyectil(Sprite):
         """Draw the bullet to the screen."""
         pygame.draw.rect(self.ventana, self.color, self.rect)
 
+
     def fire_bullet(ai_settings, ventana, personaje, proyectil, direccion):
         """Fire a bullet, if limit not reached yet."""
         # Create a new bullet, add to bullets group.
@@ -58,11 +64,15 @@ class Proyectil(Sprite):
             new_bullet = Proyectil(ai_settings, ventana, personaje, direccion)
             proyectil.add(new_bullet)
 
-    def update_bullets(proyectil, ai_settings):
+    def update_bullets(proyectil, ai_settings, muros):
         """Update position of bullets, and get rid of old bullets."""
         # Update bullet positions.
         proyectil.update()
-        #Borrar balas que se van de la pantalla
+
         for bullet in proyectil:
+            # Borrar balas que se van de la pantalla
             if bullet.rect.bottom <= 0 or bullet.rect.top >= ai_settings.screen_height or bullet.rect.right <= 0 or bullet.rect.left >= ai_settings.screen_width:
                 proyectil.remove(bullet)
+            # for muro in muros:
+            #     if pygame.sprite.collide_rect(bullet.rect, muro.rect):
+            #         proyectil.remove(bullet)

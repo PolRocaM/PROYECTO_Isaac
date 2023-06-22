@@ -1,60 +1,70 @@
+import sys
 import pygame
 from Personaje import Personaje
 from settings import Settings
 from Proyectil import Proyectil
 from enemigo import Enemigo
 from mapa import Mapa
+from nivel import Nivel
 
 # Inicializar
 pygame.init()
 
+# matriz_1 = [
+#     [1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1],
+#     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+#     [1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+#     [1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+#     [2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+#     [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+#     [1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+#     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+#     [1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1],
+# ]
+
+matriz_1 = [
+    "1111111111111111",
+    "1000000000000001",
+    "1000000000000001",
+    "1001000000001001",
+    "1001000000001001",
+    "1001000000001001",
+    "1000001111000001",
+    "1000000000000001",
+    "1111111111111111"
+]
+
 def run_game():
-    # Crea el objeto del mapa
-    matriz = [
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ]
+
     matriz2 = [
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 3, 0, 0, 5, 0, 0, 1],
+        [1, 0, 0, 0, 3, 2, 3, 3, 3, 0, 0, 1],
+        [1, 0, 0, 0, 0, 3, 0, 0, 4, 0, 0, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ]
-    mapa = Mapa(matriz)
+
     reloj = pygame.time.Clock()
     ai_settings = Settings()
     ventana = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
-    # Titulo ventana
     pygame.display.set_caption("Proyecto PRE")
-    imagen_pj = pygame.image.load('personaje_d.png')
-    imagen_enemigo = pygame.image.load('enemigo_2.png')
-    imagen_enemigo2 = pygame.image.load('enemigo_3.png')
 
-
-    speed = 5
+    nivel = Nivel()
+    muros = nivel.crearMapa(matriz_1)
 
     #crear personaje
-    personaje = Personaje(ai_settings, ventana, imagen_pj)
+    personaje = Personaje(ai_settings, ventana)
     #sprites.add(personaje)
+
     #creamos proyectiles
     proyectil = pygame.sprite.Group()
 
-    #creamos enemigos
-    #enemigo = Enemy(800, 100, mapa)
     # creamos enemigos
     enemigos = pygame.sprite.Group()
-    enemigo1 = Enemigo(ai_settings, ventana, imagen_enemigo2)
-    enemigo2 = Enemigo(ai_settings, ventana, imagen_enemigo)
-    enemigo3 = Enemigo(ai_settings, ventana, imagen_enemigo)
+    enemigo1 = Enemigo(ai_settings, ventana)
+    enemigo2 = Enemigo(ai_settings, ventana)
+    enemigo3 = Enemigo(ai_settings, ventana)
     enemigos.add(enemigo1, enemigo2, enemigo3)
 
     fps = 60
@@ -64,10 +74,12 @@ def run_game():
 
         # actualizar ventana
         ventana.fill(ai_settings.bg_color)
+        nivel.dibujar_mapa(ventana, muros)
+
         # mapa.sprites.draw(ventana)
 
         #detectar controles jugador
-        Personaje.check_events(ai_settings, ventana, personaje, proyectil)
+        Personaje.check_events(ai_settings, personaje)
 
         #actualizamos accion del personaje
         personaje.update(enemigos, ai_settings, ventana, personaje, proyectil)
@@ -77,34 +89,28 @@ def run_game():
             jugando = False
 
         #actualizamos proyectiles
-        Proyectil.update_bullets(proyectil, ai_settings)
+        Proyectil.update_bullets(proyectil, ai_settings, muros)
 
         #actualizamos enemigos
         #Enemigo.update_enemigos(enemigos, personaje, ai_settings)
-        # dibujar enemigo
         enemigo1.update(personaje, enemigos, ai_settings)
-        enemigo1.update_vida(enemigo1, ai_settings, proyectil, enemigos)
+        enemigo1.update_vida(ai_settings, proyectil, enemigos)
         enemigo2.update(personaje, enemigos, ai_settings)
-        enemigo2.update_vida(enemigo2, ai_settings, proyectil, enemigos)
+        enemigo2.update_vida(ai_settings, proyectil, enemigos)
         enemigo3.update(personaje, enemigos, ai_settings)
-        enemigo3.update_vida(enemigo3, ai_settings, proyectil, enemigos)
-
-
-        #redibujar proyectiles
-        for bullet in proyectil.sprites():
-            bullet.draw_bullet()
+        enemigo3.update_vida(ai_settings, proyectil, enemigos)
 
         # dibujar personaje
         personaje.blitme()
         personaje.draw_barra_vida(personaje.vida)
 
         # dibuja enemigos y vida de cada enemigo
-
         enemigos.draw(ventana)
         Enemigo.update_barra_vida(enemigo1)
         Enemigo.update_barra_vida(enemigo2)
         Enemigo.update_barra_vida(enemigo3)
 
+        proyectil.draw(ventana)
         pygame.display.update()
         # reloj.tick(fps)
         # Make the most recently drawn screen visible.

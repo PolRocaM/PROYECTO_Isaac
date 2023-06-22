@@ -1,60 +1,107 @@
-import random
-
 import pygame
-import os
+import random
+import math
 import sys
-from pygame.sprite import Sprite
+from enum import Enum
+from player import Player
+
+class DirectionE(Enum):
+    UP = 1
+    DOWN = 2
+    LEFT = 3
+    RIGHT = 4
+
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, x,y, mapa):
+         # Carga las imágenes de los sprites para cada dirección
+        self.images = {
+            DirectionE.UP: pygame.image.load("personaje_u.png").convert_alpha(),
+            DirectionE.DOWN: pygame.image.load("personaje_d.png"),
+            DirectionE.LEFT: pygame.image.load("personaje_l.png").convert_alpha(),
+            DirectionE.RIGHT: pygame.image.load("personaje_r.png").convert_alpha(),
+        }
+
+        self.speed = 1
+        self.x = x
+        self.y = y
+        self.direction = DirectionE.DOWN
+        self.rect = self.images[self.direction].get_rect()
+        self.mapa = mapa
+        self.player = Player
+        self.health = 100  # Atributo vida
+        self.health_font = pygame.font.SysFont('Roboto', 18)
+        self.vida = 100
+        self.vida_barra = pygame.Surface((50, 5))
+        self.vida_barra.fill((255, 0, 0))
+        enemy_x = 800
+        enemy_y = 200
+
+    velocidad = 2
+    def update(self, personaje, speed):
+        dx = personaje.centerx - self.x
+        dy = personaje.centery - self.y
+        distancia = math.sqrt(dx ** 2 + dy ** 2)
+        if distancia > 0:
+            # Normalizar el vector de dirección
+            dx = dx / distancia
+            dy = dy / distancia
+            
+            # Mover el enemigo en la dirección del jugador
+            self.x += dx * self.speed 
+            self.y += dy * self.speed
+            
+            # Comprobar colisiones con el mapa
+            if self.mapa.check_collision(self.x, self.y):
+                self.x -= dx * self.velocidad * speed
+                self.y -= dy * self.velocidad * speed
+
+    def move(self, direction):
+        # Mueve el jugador en la dirección dada y cambia su imagen
+        self.direction = direction
+        speed = 1
+        if direction == DirectionE.UP:
+            self.y -= speed
+        elif direction == DirectionE.DOWN:
+            self.y += speed
+        elif direction == DirectionE.LEFT:
+            self.x -= speed
+        elif direction == DirectionE.RIGHT:
+            self.x += speed
+
+       
+    def draw(self, screen):
+        # Dibuja el sprite en la pantalla
+        screen.blit(self.images[self.direction], (self.x, self.y))
 
 
+    def is_close_enough(self, player):
+        dx = player.x - self.x
+        dy = player.y - self.y
+        distancia = math.sqrt(dx ** 2 + dy ** 2)
+        return distancia <= 5
+    
+        
+    def attack(self, player):
+        damage = random.randint(1, 10)
+        player.take_damage(damage)
+        if self.vida < 0:
+            self.vida = 0
+        print(f"The enemy attacks and deals {damage} damage.")
 
-class Enemigo(Sprite):
-    def __init__(self, ai_settings, ventana, imagen):
-        super(Enemigo, self).__init__()
-        self.ventana = ventana
-        self.ai_settings = ai_settings
+    
+    def recibir_dano(self, cantidad):
+        self.vida -= cantidad
+        if self.vida <= 0:
+            self.kill()
+        self.update_vida_barra()
+        
+    def draw_barra_vida_enemigo(self, screen):
+        # Dibuja la barra de vida
+        vida_rect = pygame.Rect(0, 0, int(self.vida * 50 / 100), 5)
+        pygame.draw.rect(self.vida_barra, (255, 0, 0), vida_rect)
+        screen.blit(self.vida_barra, (self.x, self.y - 10))
 
-        #imagen Enemigo
-        self.image = imagen
-
-        #rect enemigo
-        self.rect = self.image.get_rect()
-        self.ventana_rect = ventana.get_rect()
-
-        #pos incial enemigo
-        self.rect.centerx = self.ventana_rect.centerx
-        self.rect.centery = self.ventana_rect.centery #- random.randrange(ai_settings.screen_height-self.rect.centery)
-
-        self.vel = -1
-        self.vel2 = -1
-
-        #guardar num float del centro del enemigo
-        self.centerx = float(self.rect.centerx)
-        self.centery = float(self.rect.centery)
-
-
-    def update(self):
-
-        self.rect.centerx += 1*self.vel
-        self.rect.centery += self.ai_settings.enemigo_speed_factor*self.vel2
-
-        #limites pantalla y cambio de dirección
-        if self.rect.right > self.ai_settings.screen_width:
-            self.vel = -1
-
-        if self.rect.left < 0:
-            self.vel = 1
-
-        if self.rect.bottom > self.ai_settings.screen_height:
-            self.vel2 = -1
-
-        if self.rect.top < 0:
-            self.vel2 = 1
+          
 
 
-
-    def blitme(self):
-        #dibuja enemigo en su pos actual
-        self.ventana.blit(self.image, self.rect)
-
-    def draw_enemigo(self):
-        pygame.draw.rect(self.ventana, self.image, self.rect)
+    
