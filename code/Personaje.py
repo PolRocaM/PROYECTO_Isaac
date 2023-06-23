@@ -48,7 +48,11 @@ class Personaje(pygame.sprite.Sprite):
         self.cadencia = 500
         self.ultimo_disparo = pygame.time.get_ticks()
 
-    def update(self, enemigos, ai_settings, ventana, personaje, proyectil):
+        #dinero pj
+        self.dinero = 0
+
+    def update(self, enemigos, ai_settings, ventana, personaje, proyectil, muros):
+
         # Update the personaje's center value, not the rect.
         #mover personaje DERECHA
         if self.moving_right and self.rect.right < self.screen_rect.right:
@@ -66,6 +70,9 @@ class Personaje(pygame.sprite.Sprite):
         if self.moving_up and self.rect.top > 0:
             self.centery -= self.ai_settings.personaje_speed_factor
             self.image = pygame.image.load('personaje_u.png')
+
+        self.check_col_enemigo(enemigos)
+        self.check_col_muros(muros)
 
         # Update rect object from self.center.
         self.rect.centerx = self.centerx
@@ -97,7 +104,6 @@ class Personaje(pygame.sprite.Sprite):
                 Proyectil.fire_bullet(ai_settings, ventana, personaje, proyectil, pygame.K_RIGHT)
                 self.ultimo_disparo = ahora
 
-        self.check_col_enemigo(enemigos)
 
     def check_col_enemigo(self, enemigos):
         colision_enemigo = pygame.sprite.spritecollide(self, enemigos, False)
@@ -108,6 +114,18 @@ class Personaje(pygame.sprite.Sprite):
                 self.vida = 0
                 self.kill()
 
+    def check_col_muros(self, muros):
+        for muro in muros:
+            if self.rect.colliderect(muro):
+                if self.moving_right:
+                    self.centerx -= self.ai_settings.personaje_speed_factor + 2
+                elif self.moving_left:
+                    self.centerx -= self.ai_settings.personaje_speed_factor - 2
+                elif self.moving_up:
+                    self.centery -= self.ai_settings.personaje_speed_factor - 2
+                elif self.moving_down:
+                    self.centery -= self.ai_settings.personaje_speed_factor + 2
+
     def draw_barra_vida(self, vida):
         calculo_largo = int((vida/100)*self.largo)
         self.vida_barra = pygame.Surface((calculo_largo, self.ancho))
@@ -115,13 +133,14 @@ class Personaje(pygame.sprite.Sprite):
         rectangulo = pygame.Rect(0, 0, calculo_largo, self.ancho)
         pygame.draw.rect(self.vida_barra_max, (0, 0, 0), borde)
         pygame.draw.rect(self.vida_barra, (0, 255, 0), rectangulo)
+        self.ventana.blit(self.vida_barra_max, (self.screen_rect.left+20, self.screen_rect.top+20))
         self.ventana.blit(self.vida_barra, (self.screen_rect.left+20, self.screen_rect.top+20))
     def blitme(self):
         #dibuja el personaje en su localización actual
         self.ventana.blit(self.image, self.rect)
 
     def check_keydown_events(event, personaje):
-        """Respond to keypresses."""
+        #flag mover personaje
         if event.key == pygame.K_d:
             personaje.moving_right = True
         elif event.key == pygame.K_a:
@@ -130,7 +149,8 @@ class Personaje(pygame.sprite.Sprite):
             personaje.moving_up = True
         elif event.key == pygame.K_s:
             personaje.moving_down = True
-        #
+
+        # flag disparar proyectil
         if event.key == pygame.K_UP:
             personaje.proyectil_up = True
         if event.key == pygame.K_DOWN:

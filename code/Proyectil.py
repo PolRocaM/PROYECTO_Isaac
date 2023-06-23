@@ -1,6 +1,6 @@
 import pygame
 from pygame.sprite import Sprite
-from Tiles import Tile
+
 class Proyectil(Sprite):
     def __init__(self, ai_settings, ventana, personaje, direccion):
         super(Proyectil, self).__init__()
@@ -70,9 +70,10 @@ class Proyectil(Sprite):
         proyectil.update()
 
         for bullet in proyectil:
-            # Borrar balas que se van de la pantalla
-            if bullet.rect.bottom <= 0 or bullet.rect.top >= ai_settings.screen_height or bullet.rect.right <= 0 or bullet.rect.left >= ai_settings.screen_width:
-                proyectil.remove(bullet)
-            # for muro in muros:
-            #     if pygame.sprite.collide_rect(bullet.rect, muro.rect):
-            #         proyectil.remove(bullet)
+            # # Borrar balas que se van de la pantalla
+            # if bullet.rect.bottom <= 0 or bullet.rect.top >= ai_settings.screen_height or bullet.rect.right <= 0 or bullet.rect.left >= ai_settings.screen_width:
+            #     proyectil.remove(bullet)
+            # borrar balas que colisionan con los muros
+            for muro in muros:
+                if bullet.rect.colliderect(muro):
+                    proyectil.remove(bullet)

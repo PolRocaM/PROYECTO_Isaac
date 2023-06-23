@@ -58,7 +58,7 @@ class Enemigo(Sprite):
         # self.centerx = self.centerx
 
 
-    def update_vida(self, ai_settings, proyectil, enemigos):
+    def update_vida(self, ai_settings, proyectil, enemigos, personaje):
 
         colisiones = pygame.sprite.groupcollide(enemigos, proyectil, False, True)
         for enemigos,proyectiles in colisiones.items():
@@ -68,6 +68,8 @@ class Enemigo(Sprite):
                 if enemigos.vida <= 0:
                     enemigos.vida = 0
                     enemigos.kill()
+                    personaje.dinero += 25
+                    print(personaje.dinero)
 
     def draw_barra_vida_enemigo(self):
         # Dibuja la barra de vida
@@ -80,6 +82,3 @@ class Enemigo(Sprite):
         enemigo.vida_barra = pygame.Surface((enemigo.vida*45/100, 5))
         enemigo.draw_barra_vida_enemigo()
 
-
-    # def update_enemigos(enemigos, personaje, ai_settings):
-    #     enemigos.update(personaje, enemigos, ai_settings)
