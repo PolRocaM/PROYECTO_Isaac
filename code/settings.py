@@ -7,7 +7,7 @@ class Settings():
         # Ventana settings.
         self.screen_width = 1280
         self.screen_height = 720
-        self.bg_color = (0, 50, 0) #color negro
+        self.bg_color = (137, 107, 73) #color marron
 
         # Personaje settings.
         self.personaje_speed_factor = 1

@@ -10,23 +10,23 @@ class Enemigo_tipo2(Enemigo):
         self.ventana = ventana
         self.ai_settings = ai_settings
 
-        self.image = pygame.image.load("personaje_d.png")
+        self.image = pygame.image.load("./imagenes/enemigo_3.png")
         self.rect = self.image.get_rect()
         self.ventana_rect = ventana.get_rect()
 
-        self.centerx = float(random.randrange(ai_settings.screen_width))
-        self.centery = float(random.randrange(ai_settings.screen_height))
+        self.centerx = 80 + float(random.randrange(ai_settings.screen_width-160))
+        self.centery = 80 + float(random.randrange(ai_settings.screen_height-160))
         self.rect.centerx = self.centerx
         self.rect.centery = self.centery
 
-        self.teleport = 5000
+        self.teleport = 1500
         self.ultimo_teleport = pygame.time.get_ticks()
 
     def update(self, personaje, enemigos, ai_settings):
         ahora = pygame.time.get_ticks()
         if ahora - self.ultimo_teleport > self.teleport:
-            self.centerx = float(random.randrange(ai_settings.screen_width))
-            self.centery = float(random.randrange(ai_settings.screen_height))
+            self.centerx = 80 + float(random.randrange(ai_settings.screen_width-160))
+            self.centery = 80 + float(random.randrange(ai_settings.screen_height-160))
             self.rect.centerx = self.centerx
             self.rect.centery = self.centery
             self.ultimo_teleport = ahora

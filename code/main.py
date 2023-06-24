@@ -14,7 +14,7 @@ fuente1 = pygame.font.SysFont("arial black", 24)
 fuente2 = pygame.font.SysFont("Segoe print", 32)
 
 matriz_1 = [
-    "11111111111111111111111111111111",
+    "11111111111111122111111111111111",
     "10000000000000000000000000000001",
     "10000000000000000000000000000001",
     "10000000000000000000000000000001",
@@ -22,8 +22,8 @@ matriz_1 = [
     "10000000000000000000000000000001",
     "10000000000000000000000000000001",
     "10000000000000000000000000000001",
-    "10000000000000000000000000000002",
-    "10000000000000000000000000000002",
+    "10000000000000000000000000000001",
+    "10000000000000000000000000000001",
     "10000000000000000000000000000001",
     "10000000000000000000000000000001",
     "10000000000000000000000000000001",
@@ -36,30 +36,22 @@ matriz_1 = [
 
 def run_game():
 
-    matriz2 = [
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 3, 0, 0, 5, 0, 0, 1],
-        [1, 0, 0, 0, 3, 2, 3, 3, 3, 0, 0, 1],
-        [1, 0, 0, 0, 0, 3, 0, 0, 4, 0, 0, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ]
-    next_level = False
     reloj = pygame.time.Clock()
     ai_settings = Settings()
     ventana = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
     pygame.display.set_caption("Proyecto PRE")
 
     nivel = Nivel()
-    muros = nivel.crearMapa(matriz_1)
+    muros = nivel.crearMuros(matriz_1)
+    puertas = nivel.crearPuertas(matriz_1)
+    siguiente_nivel = False
 
     #crear personaje
     personaje = Personaje(ai_settings, ventana)
-    #creamos proyectiles
+    #creamos grupo proyectiles
     proyectil = pygame.sprite.Group()
-    # creamos enemigos
+    # creamos grupo enemigos
     enemigos = pygame.sprite.Group()
-
 
     fps = 60
     jugando = True
@@ -68,30 +60,14 @@ def run_game():
     nivel_2 = False
 
     while jugando:
-        # GAME OVER
-        if personaje.vida == 0:
-            nivel_1 = False
-            ventana.fill((0, 0, 0))
-            historia = [
-                "Has Muerto"
-            ]
-            y = 100
-            for frase in historia:
-                texto = fuente2.render(frase, True, (255, 255, 255))
-                ventana.blit(texto, (150, y))
-                y += 40
-            pygame.display.update()
-            pygame.time.delay(5000)
-            menu_principal = True
-
         while menu_principal:
             ventana.fill((255, 255, 205))
-            historia = [
+            opciones = [
                 "new game <Press enter>",
                 "Exit"
             ]
             y = 100
-            for frase in historia:
+            for frase in opciones:
                 texto = fuente2.render(frase, True, (0, 0, 0))
                 ventana.blit(texto, (150, y))
                 y += 40
@@ -104,17 +80,11 @@ def run_game():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         menu_principal = False
-                        ventana.fill((0, 0, 0))
-                        historia = [
-                            "nivel 1"
-                        ]
-                        y = 100
-                        for frase in historia:
-                            texto = fuente2.render(frase, True, (255, 255, 255))
-                            ventana.blit(texto, (150, y))
-                            y += 40
-                        pygame.display.update()
-                        pygame.time.delay(3000)
+                        #pantalla de transición
+                        texto_nivel1 = [" nivel 1 "]
+                        nivel.dibujar_pantalla_transicion(ventana, texto_nivel1, fuente2, 3000)
+                        personaje.reset_pos()
+                        personaje.estado_inicial(enemigos)
                         enemigo1 = Enemigo(ai_settings, ventana)
                         enemigo2 = Enemigo(ai_settings, ventana)
                         enemigo3 = Enemigo(ai_settings, ventana)
@@ -122,16 +92,19 @@ def run_game():
                         nivel_1 = True
 
         while nivel_1:
+            # GAME OVER
+            if personaje.vida == 0:
+                nivel_1 = False
+                texto_GameOver = ["GAME OVER"]
+                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 4000)
+                menu_principal = True
+
             # actualizar ventana
             ventana.fill(ai_settings.bg_color)
-            nivel.dibujar_mapa(ventana, muros)
-
-            # mapa.sprites.draw(ventana)
+            nivel.dibujar_mapa(ventana, muros, puertas, siguiente_nivel)
 
             #detectar controles jugador
             Personaje.check_events(ai_settings, personaje)
-
-            #actualizamos accion del personaje
             personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
 
             #actualizamos proyectiles
@@ -164,38 +137,35 @@ def run_game():
 
             #transicio a nivel 2
             if len(enemigos) == 0:
-                nivel_1 = False
-                ventana.fill((0, 0, 0))
-                historia = [
-                    "Nivel 2"
-                ]
-                y = 100
-                for frase in historia:
-                    texto = fuente2.render(frase, True, (255, 255, 255))
-                    ventana.blit(texto, (200, y))
-                    y += 40
-                pygame.display.update()
-                pygame.time.delay(3000)
-                enemigo4 = Enemigo_tipo2(ai_settings, ventana)
-                enemigo5 = Enemigo_tipo2(ai_settings, ventana)
-                enemigos.add(enemigo4, enemigo5)
-                nivel_2 = True
+                siguiente_nivel = True
+                if nivel.check_col_puerta_abierta(personaje, puertas):
+                    nivel_1 = False
+                    siguiente_nivel = False
+                    texto_nivel2 = ["Nivel 2"]
+                    nivel.dibujar_pantalla_transicion(ventana, texto_nivel2, fuente2, 3000)
+                    personaje.reset_pos()
+                    enemigo4 = Enemigo_tipo2(ai_settings, ventana)
+                    enemigo5 = Enemigo_tipo2(ai_settings, ventana)
+                    enemigos.add(enemigo4, enemigo5)
+                    nivel_2 = True
 
         while nivel_2:
+            #GAME OVER
+            if personaje.vida == 0:
+                nivel_2 = False
+                texto_GameOver = ["GAME OVER"]
+                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 5000)
+                menu_principal = True
 
             # actualizar ventana
             ventana.fill(ai_settings.bg_color)
-            nivel.dibujar_mapa(ventana, muros)
-
-            # mapa.sprites.draw(ventana)
+            nivel.dibujar_mapa(ventana, muros, puertas, siguiente_nivel)
 
             # detectar controles jugador
             Personaje.check_events(ai_settings, personaje)
 
             # actualizamos accion del personaje
             personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
-
-            nivel.check_siguiente_nivel(enemigos)
 
             # actualizamos proyectiles
             Proyectil.update_bullets(proyectil, ai_settings, muros)
@@ -224,23 +194,13 @@ def run_game():
 
             if len(enemigos) == 0:
                 nivel_2 = False
-                ventana.fill((0, 0, 0))
-                historia = [
-                    "Has ganado"
-                ]
-                y = 100
-                for frase in historia:
-                    texto = fuente2.render(frase, True, (255, 255, 255))
-                    ventana.blit(texto, (200, y))
-                    y += 40
-                pygame.display.update()
-                pygame.time.delay(3000)
+                texto_EndGame = ["Has ganado"]
+                nivel.dibujar_pantalla_transicion(ventana, texto_EndGame, fuente2, 5000)
                 menu_principal = True
 
 
 if __name__ == '__main__':
 
     run_game()
-
     # Salir
     pygame.quit()

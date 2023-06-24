@@ -45,11 +45,84 @@ class Personaje(pygame.sprite.Sprite):
         self.proyectil_down = False
         self.proyectil_right = False
         self.proyectil_left = False
-        self.cadencia = 500
+        self.cadencia = 300
         self.ultimo_disparo = pygame.time.get_ticks()
 
         #dinero pj
         self.dinero = 0
+
+    def check_keydown_events(event, personaje):
+        #flag mover personaje
+        if event.key == pygame.K_d:
+            personaje.moving_right = True
+        elif event.key == pygame.K_a:
+            personaje.moving_left = True
+        elif event.key == pygame.K_w:
+            personaje.moving_up = True
+        elif event.key == pygame.K_s:
+            personaje.moving_down = True
+
+        # flag disparar proyectil
+        if event.key == pygame.K_UP:
+            personaje.proyectil_up = True
+        if event.key == pygame.K_DOWN:
+            personaje.proyectil_down = True
+        if event.key == pygame.K_LEFT:
+            personaje.proyectil_left = True
+        if event.key == pygame.K_RIGHT:
+            personaje.proyectil_right = True
+
+    def check_keyup_events(event, personaje):
+        """Respond to key releases."""
+        if event.key == pygame.K_d:
+            personaje.moving_right = False
+        elif event.key == pygame.K_a:
+            personaje.moving_left = False
+        elif event.key == pygame.K_w:
+            personaje.moving_up = False
+        elif event.key == pygame.K_s:
+            personaje.moving_down = False
+        if event.key == pygame.K_UP:
+            personaje.proyectil_up = False
+        elif event.key == pygame.K_DOWN:
+            personaje.proyectil_down = False
+        if event.key == pygame.K_LEFT:
+            personaje.proyectil_left = False
+        if event.key == pygame.K_RIGHT:
+            personaje.proyectil_right = False
+
+    def check_events(ai_settings, personaje):
+        """Respond to keypresses events."""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                Personaje.check_keydown_events(event, personaje)
+            elif event.type == pygame.KEYUP:
+                Personaje.check_keyup_events(event, personaje)
+
+    def reset_pos(self):
+        self.moving_right = False
+        self.moving_left = False
+        self.moving_up = False
+        self.moving_down = False
+
+        self.proyectil_up = False
+        self.proyectil_down = False
+        self.proyectil_right = False
+        self.proyectil_left = False
+
+        # pos inicial del personaje en el centro de la pantalla
+        self.centerx = float(self.screen_rect.centerx)
+        self.centery = float(self.screen_rect.centery)
+    def estado_inicial(self, enemigos):
+
+        self.vida = 100
+        self.dinero = 0
+        self.cadencia = 300
+
+        for enemigo in enemigos:
+            enemigo.kill()
 
     def update(self, enemigos, ai_settings, ventana, personaje, proyectil, muros):
 
@@ -133,58 +206,10 @@ class Personaje(pygame.sprite.Sprite):
         rectangulo = pygame.Rect(0, 0, calculo_largo, self.ancho)
         pygame.draw.rect(self.vida_barra_max, (0, 0, 0), borde)
         pygame.draw.rect(self.vida_barra, (0, 255, 0), rectangulo)
-        self.ventana.blit(self.vida_barra_max, (self.screen_rect.left+20, self.screen_rect.top+20))
-        self.ventana.blit(self.vida_barra, (self.screen_rect.left+20, self.screen_rect.top+20))
+        self.ventana.blit(self.vida_barra_max, (self.screen_rect.left+40, self.screen_rect.top+7.5))
+        self.ventana.blit(self.vida_barra, (self.screen_rect.left+40, self.screen_rect.top+7.5))
     def blitme(self):
         #dibuja el personaje en su localización actual
         self.ventana.blit(self.image, self.rect)
 
-    def check_keydown_events(event, personaje):
-        #flag mover personaje
-        if event.key == pygame.K_d:
-            personaje.moving_right = True
-        elif event.key == pygame.K_a:
-            personaje.moving_left = True
-        elif event.key == pygame.K_w:
-            personaje.moving_up = True
-        elif event.key == pygame.K_s:
-            personaje.moving_down = True
 
-        # flag disparar proyectil
-        if event.key == pygame.K_UP:
-            personaje.proyectil_up = True
-        if event.key == pygame.K_DOWN:
-            personaje.proyectil_down = True
-        if event.key == pygame.K_LEFT:
-            personaje.proyectil_left = True
-        if event.key == pygame.K_RIGHT:
-            personaje.proyectil_right = True
-
-    def check_keyup_events(event, personaje):
-        """Respond to key releases."""
-        if event.key == pygame.K_d:
-            personaje.moving_right = False
-        elif event.key == pygame.K_a:
-            personaje.moving_left = False
-        elif event.key == pygame.K_w:
-            personaje.moving_up = False
-        elif event.key == pygame.K_s:
-            personaje.moving_down = False
-        if event.key == pygame.K_UP:
-            personaje.proyectil_up = False
-        elif event.key == pygame.K_DOWN:
-            personaje.proyectil_down = False
-        if event.key == pygame.K_LEFT:
-            personaje.proyectil_left = False
-        if event.key == pygame.K_RIGHT:
-            personaje.proyectil_right = False
-
-    def check_events(ai_settings, personaje):
-        """Respond to keypresses events."""
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                Personaje.check_keydown_events(event, personaje)
-            elif event.type == pygame.KEYUP:
-                Personaje.check_keyup_events(event, personaje)

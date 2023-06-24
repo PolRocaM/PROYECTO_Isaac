@@ -61,7 +61,7 @@ class Enemigo(Sprite):
     def update_vida(self, ai_settings, proyectil, enemigos, personaje):
 
         colisiones = pygame.sprite.groupcollide(enemigos, proyectil, False, True)
-        for enemigos,proyectiles in colisiones.items():
+        for enemigos, proyectiles in colisiones.items():
             # print (enemigos, proyectiles)
             for i in proyectiles:
                 enemigos.vida -= ai_settings.proyectil_dmg
