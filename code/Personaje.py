@@ -11,7 +11,7 @@ class Personaje(pygame.sprite.Sprite):
         self.ai_settings = ai_settings
 
         #imagen del personaje y su rect
-        self.image = pygame.image.load('./imagenes/personaje_d.png')
+        self.image = pygame.image.load('./imagenes/isaac_d.png')
         self.rect = self.image.get_rect()
         self.screen_rect = ventana.get_rect()
 
@@ -51,7 +51,10 @@ class Personaje(pygame.sprite.Sprite):
         #dinero pj
         self.dinero = 0
 
-    def check_keydown_events(event, personaje):
+        self.invulnerable = 500
+        self.last_hit = pygame.time.get_ticks()
+
+    def check_keydown_events(event, personaje): #activar flags
         #flag mover personaje
         if event.key == pygame.K_d:
             personaje.moving_right = True
@@ -72,7 +75,7 @@ class Personaje(pygame.sprite.Sprite):
         if event.key == pygame.K_RIGHT:
             personaje.proyectil_right = True
 
-    def check_keyup_events(event, personaje):
+    def check_keyup_events(event, personaje): # desactivar flags
         """Respond to key releases."""
         if event.key == pygame.K_d:
             personaje.moving_right = False
@@ -82,6 +85,7 @@ class Personaje(pygame.sprite.Sprite):
             personaje.moving_up = False
         elif event.key == pygame.K_s:
             personaje.moving_down = False
+
         if event.key == pygame.K_UP:
             personaje.proyectil_up = False
         elif event.key == pygame.K_DOWN:
@@ -101,7 +105,7 @@ class Personaje(pygame.sprite.Sprite):
             elif event.type == pygame.KEYUP:
                 Personaje.check_keyup_events(event, personaje)
 
-    def reset_inicial(self):
+    def reset_inicial(self, enemigos): #reset para nueva partida
         self.moving_right = False
         self.moving_left = False
         self.moving_up = False
@@ -116,8 +120,10 @@ class Personaje(pygame.sprite.Sprite):
         self.centerx = float(self.screen_rect.centerx)
         self.centery = float(self.screen_rect.centery)
 
+        for enemigo in enemigos:
+            enemigo.remove(enemigos)
 
-    def reset_pos_sup(self):
+    def reset_pos_sup(self):#resetar parametros despues de cruzar puerta superior
         self.moving_right = False
         self.moving_left = False
         self.moving_up = False
@@ -132,7 +138,7 @@ class Personaje(pygame.sprite.Sprite):
         self.centerx = float(self.screen_rect.centerx)
         self.centery = float(self.screen_rect.bottom) - 100
 
-    def reset_pos_inf(self):
+    def reset_pos_inf(self): #resetar parametros despues de cruzar puerta inferior
         self.moving_right = False
         self.moving_left = False
         self.moving_up = False
@@ -147,11 +153,12 @@ class Personaje(pygame.sprite.Sprite):
         self.centerx = float(self.screen_rect.centerx)
         self.centery = float(100)
 
-    def estado_inicial(self):
+    def estado_inicial(self): # resetear stats iniciales
 
         self.vida = 100
         self.dinero = 0
         self.cadencia = 300
+        self.invulnerable = 500
 
     def update(self, enemigos, ai_settings, ventana, personaje, proyectil, muros):
 
@@ -159,19 +166,19 @@ class Personaje(pygame.sprite.Sprite):
         #mover personaje DERECHA
         if self.moving_right and self.rect.right < self.screen_rect.right:
             self.centerx += self.ai_settings.personaje_speed_factor
-            self.image = pygame.image.load('./imagenes/personaje_r.png')
+            self.image = pygame.image.load('./imagenes/isaac_r.png')
         #mover personaje IZQUIERDA
         if self.moving_left and self.rect.left > 0:
             self.centerx -= self.ai_settings.personaje_speed_factor
-            self.image = pygame.image.load('./imagenes/personaje_l.png')
+            self.image = pygame.image.load('./imagenes/isaac_l.png')
         #mover personaje ABAJO
         if self.moving_down and self.rect.bottom < self.screen_rect.bottom:
             self.centery += self.ai_settings.personaje_speed_factor
-            self.image = pygame.image.load('./imagenes/personaje_d.png')
+            self.image = pygame.image.load('./imagenes/isaac_d.png')
         #mover personaje ARRIBA
         if self.moving_up and self.rect.top > 0:
             self.centery -= self.ai_settings.personaje_speed_factor
-            self.image = pygame.image.load('./imagenes/personaje_u.png')
+            self.image = pygame.image.load('./imagenes/isaac_u.png')
 
         self.check_col_enemigo(enemigos)
         self.check_col_muros(muros)
@@ -182,39 +189,41 @@ class Personaje(pygame.sprite.Sprite):
 
         #mantener para disparar
         if self.proyectil_up:
-            self.image = pygame.image.load('./imagenes/personaje_u.png')
+            self.image = pygame.image.load('./imagenes/isaac_u.png')
             ahora = pygame.time.get_ticks()
             if ahora-self.ultimo_disparo > self.cadencia:
                 Proyectil.fire_bullet(ai_settings, ventana, personaje, proyectil, pygame.K_UP)
                 self.ultimo_disparo = ahora
         elif self.proyectil_down:
-            self.image = pygame.image.load('./imagenes/personaje_d.png')
+            self.image = pygame.image.load('./imagenes/isaac_d.png')
             ahora = pygame.time.get_ticks()
             if ahora - self.ultimo_disparo > self.cadencia:
                 Proyectil.fire_bullet(ai_settings, ventana, personaje, proyectil, pygame.K_DOWN)
                 self.ultimo_disparo = ahora
         elif self.proyectil_left:
-            self.image = pygame.image.load('./imagenes/personaje_l.png')
+            self.image = pygame.image.load('./imagenes/isaac_l.png')
             ahora = pygame.time.get_ticks()
             if ahora - self.ultimo_disparo > self.cadencia:
                 Proyectil.fire_bullet(ai_settings, ventana, personaje, proyectil, pygame.K_LEFT)
                 self.ultimo_disparo = ahora
         elif self.proyectil_right:
-            self.image = pygame.image.load('./imagenes/personaje_r.png')
+            self.image = pygame.image.load('./imagenes/isaac_r.png')
             ahora = pygame.time.get_ticks()
             if ahora - self.ultimo_disparo > self.cadencia:
                 Proyectil.fire_bullet(ai_settings, ventana, personaje, proyectil, pygame.K_RIGHT)
                 self.ultimo_disparo = ahora
 
-
     def check_col_enemigo(self, enemigos):
         colision_enemigo = pygame.sprite.spritecollide(self, enemigos, False)
         # actualizamos vida personaje
         if colision_enemigo:
-            self.vida -= 0.25
-            if self.vida <= 0:
-                self.vida = 0
-                self.kill()
+            ahora = pygame.time.get_ticks()
+            if ahora - self.last_hit > self.invulnerable:
+                self.vida -= self.ai_settings.dmg_enemigo
+                if self.vida <= 0:
+                    self.vida = 0
+                    self.kill()
+                self.last_hit = ahora
 
     def check_col_muros(self, muros):
         for muro in muros:
@@ -228,6 +237,14 @@ class Personaje(pygame.sprite.Sprite):
                 elif self.moving_down:
                     self.centery -= self.ai_settings.personaje_speed_factor + 2
 
+    def recibir_danyo_lava(self, nivel, lava):
+        if nivel.check_col_lava(self, lava):
+            ahora = pygame.time.get_ticks()
+            if ahora - self.last_hit > self.invulnerable:
+                self.vida -= 5
+                if self.vida < 0:
+                    self.vida = 0
+                self.last_hit = ahora
     def draw_barra_vida(self, vida):
         calculo_largo = int((vida/100)*self.largo)
         self.vida_barra = pygame.Surface((calculo_largo, self.ancho))

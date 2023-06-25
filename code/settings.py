@@ -22,7 +22,7 @@ class Settings():
 
         # Enemigos settings
         self.enemigo_speed_factor = 0.7
-        self.enemigo_dmg = 25
+        self.dmg_enemigo = 10
 
 
 

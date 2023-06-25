@@ -42,13 +42,13 @@ class Enemigo(Sprite):
         self.rect.centery = self.centery
 
         #limites pantalla y cambio de dirección
-        if self.rect.right > self.ai_settings.screen_width:
+        if self.rect.right > self.ai_settings.screen_width-40:
             self.dir = -1.0
-        if self.rect.left < 0:
+        if self.rect.left < 40:
             self.dir = 1.0
-        if self.rect.bottom > self.ai_settings.screen_height:
+        if self.rect.bottom > self.ai_settings.screen_height-40:
             self.dir2 = -1.0
-        if self.rect.top < 0:
+        if self.rect.top < 40:
             self.dir2 = 1.0
         # if self.rect == personaje.rect.centery-25:
         #     self.dir2 = self.dir2 *-1

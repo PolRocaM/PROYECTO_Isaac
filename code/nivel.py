@@ -105,6 +105,12 @@ class Nivel():
                 col_puerta = True
                 return col_puerta
 
+    def check_col_lava(self, personaje, lava):
+        for i in lava:
+            if personaje.rect.colliderect(i):
+                col_lava = True
+                return col_lava
+
     def dibujar_pantalla_transicion(self, ventana, texto1, fuente, centrado_texto, delay):
         ventana.fill((0, 0, 0))
         y = 275

@@ -13,7 +13,8 @@ pygame.init()
 
 fuente1 = pygame.font.SysFont("arial black", 24)
 fuente2 = pygame.font.SysFont("Segoe print", 32)
-
+texto_nivel1 = [" Entering the dungeon... "]
+texto_GameOver = ["GAME OVER"]
 reloj = pygame.time.Clock()
 ai_settings = Settings()
 ventana = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
@@ -82,12 +83,12 @@ def run_game():
                     if event.key == pygame.K_RETURN:
                         menu_principal = False
                         #pantalla de transición
-                        texto_nivel1 = [" Entrando en la mazmorra... "]
-                        nivel.dibujar_pantalla_transicion(ventana, texto_nivel1, fuente2,400, 3000)
+                        nivel.dibujar_pantalla_transicion(ventana, texto_nivel1, fuente2, 400, 3000)
+                        abrir_puertas = False
                         enemigos_eliminados_nivel2 = False
                         enemigos_eliminados_nivel3 = False
                         enemigos_eliminados_nivel4 = False
-                        personaje.reset_inicial()
+                        personaje.reset_inicial(enemigos)
                         personaje.estado_inicial()
                         enemigo1 = Enemigo(ai_settings, ventana)
                         enemigo2 = Enemigo(ai_settings, ventana)
@@ -99,8 +100,7 @@ def run_game():
             if personaje.vida == 0:
                 nivel_actual = 0
                 nivel_1 = False
-                texto_GameOver = ["GAME OVER"]
-                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 540, 5000)
+                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 525, 5000)
                 menu_principal = True
 
             # actualizar ventana
@@ -109,7 +109,9 @@ def run_game():
 
             #detectar controles jugador
             Personaje.check_events(ai_settings, personaje)
+            personaje.recibir_danyo_lava(nivel, lava)
             personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
+
 
             #actualizamos proyectiles
             Proyectil.update_bullets(proyectil, ai_settings, muros)
@@ -160,18 +162,15 @@ def run_game():
             if personaje.vida == 0:
                 nivel_actual = 0
                 nivel_2 = False
-                texto_GameOver = ["GAME OVER"]
-                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 540, 5000)
+                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 530, 5000)
                 menu_principal = True
 
             # actualizar ventana
             ventana.fill(ai_settings.bg_color)
             nivel.dibujar_mapa(ventana, muros, puertas_sup, puertas_inf, lava, abrir_puertas)
 
-            # detectar controles jugador
             Personaje.check_events(ai_settings, personaje)
-
-            # actualizamos accion del personaje
+            personaje.recibir_danyo_lava(nivel, lava)
             personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
 
             # actualizamos proyectiles
@@ -226,8 +225,7 @@ def run_game():
             if personaje.vida == 0:
                 nivel_actual = 0
                 nivel_3 = False
-                texto_GameOver = ["GAME OVER"]
-                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 540, 5000)
+                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 530, 5000)
                 menu_principal = True
 
             # actualizar ventana
@@ -236,8 +234,7 @@ def run_game():
 
             # detectar controles jugador
             Personaje.check_events(ai_settings, personaje)
-
-            # actualizamos accion del personaje
+            personaje.recibir_danyo_lava(nivel, lava)
             personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
 
             # actualizamos proyectiles
@@ -291,8 +288,7 @@ def run_game():
             if personaje.vida == 0:
                 nivel_actual = 0
                 nivel_4 = False
-                texto_GameOver = ["GAME OVER"]
-                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 540, 5000)
+                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 530, 5000)
                 menu_principal = True
 
             # actualizar ventana
@@ -301,8 +297,7 @@ def run_game():
 
             # detectar controles jugador
             Personaje.check_events(ai_settings, personaje)
-
-            # actualizamos accion del personaje
+            personaje.recibir_danyo_lava(nivel, lava)
             personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
 
             # actualizamos proyectiles
@@ -356,8 +351,7 @@ def run_game():
             if personaje.vida == 0:
                 nivel_actual = 0
                 nivel_5 = False
-                texto_GameOver = ["GAME OVER"]
-                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 540, 5000)
+                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 530, 5000)
                 menu_principal = True
 
             # actualizar ventana
@@ -366,8 +360,7 @@ def run_game():
 
             # detectar controles jugador
             Personaje.check_events(ai_settings, personaje)
-
-            # actualizamos accion del personaje
+            personaje.recibir_danyo_lava(nivel, lava)
             personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
 
             # actualizamos proyectiles
@@ -395,8 +388,8 @@ def run_game():
             #transicio a nivel boss
             if len(enemigos) == 0:
                 nivel_5 = False
-                texto_EndGame = ["Mazmorra succesfully cleared"]
-                nivel.dibujar_pantalla_transicion(ventana, texto_EndGame, fuente2, 350, 5000)
+                texto_EndGame = ["Dungeon cleared successfully"]
+                nivel.dibujar_pantalla_transicion(ventana, texto_EndGame, fuente2, 400, 5000)
                 nivel_actual = 0
                 menu_principal = True
 
