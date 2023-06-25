@@ -22,11 +22,13 @@ class Enemigo_tipo2(Enemigo):
         self.teleport = 1500
         self.ultimo_teleport = pygame.time.get_ticks()
 
+        self.vida = 150
+
     def update(self, personaje, enemigos, ai_settings):
         ahora = pygame.time.get_ticks()
         if ahora - self.ultimo_teleport > self.teleport:
-            self.centerx = 80 + float(random.randrange(ai_settings.screen_width-160))
-            self.centery = 80 + float(random.randrange(ai_settings.screen_height-160))
+            self.centerx = 80 + float(random.randrange(500))
+            self.centery = 80 + float(random.randrange(500))
             self.rect.centerx = self.centerx
             self.rect.centery = self.centery
             self.ultimo_teleport = ahora

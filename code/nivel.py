@@ -15,6 +15,8 @@ class Nivel():
         self.imagen_puerta_abierta = pygame.image.load("./imagenes/puerta_abierta.png").convert()
         self.imagen_puerta_abierta_redimensionada = pygame.transform.scale(self.imagen_puerta_abierta, (40, 40))
 
+        self.imagen_lava = pygame.image.load("./imagenes/lava_1.png").convert()
+        self.imagen_lava_redimensionada = pygame.transform.scale(self.imagen_lava, (40, 40))
 
     def crearMuros(self, matriz):
         muros = []
@@ -29,18 +31,44 @@ class Nivel():
             y += 40
         return muros
 
-    def crearPuertas(self, matriz):
-        puertas = []
+    def crearPuertasSuperiores(self, matriz):
+        puertas_sup = []
         x = 0
         y = 0
         for fila in matriz:
             for col in fila:
                 if col == "2":
-                    puertas.append(pygame.Rect(x, y, 40, 40))
+                    puertas_sup.append(pygame.Rect(x, y, 40, 40))
                 x += 40
             x = 0
             y += 40
-        return puertas
+        return puertas_sup
+
+    def crearPuertasInferiores(self, matriz):
+        puertas_inf = []
+        x = 0
+        y = 0
+        for fila in matriz:
+            for col in fila:
+                if col == "3":
+                    puertas_inf.append(pygame.Rect(x, y, 40, 40))
+                x += 40
+            x = 0
+            y += 40
+        return puertas_inf
+
+    def crearLava(self, matriz):
+        lava = []
+        x = 0
+        y = 0
+        for fila in matriz:
+            for col in fila:
+                if col == "4":
+                    lava.append(pygame.Rect(x, y, 40, 40))
+                x += 40
+            x = 0
+            y += 40
+        return lava
 
     def dibujar_muro(self, ventana, rectangulo):
         ventana.blit(self.imagen_muro_redimensionado, rectangulo)
@@ -51,15 +79,24 @@ class Nivel():
     def dibujar_puerta_abierta(self, ventana, rectangulo):
         ventana.blit(self.imagen_puerta_abierta_redimensionada, rectangulo)
 
-    def dibujar_mapa(self, ventana, muros, puertas, sig_nivel):
+    def dibujar_lava(self, ventana, rectangulo):
+        ventana.blit(self.imagen_lava_redimensionada, rectangulo)
+
+    def dibujar_mapa(self, ventana, muros, puertas_sup, puertas_inf, lava, abrir_puertas):
             for muro in muros:
                 self.dibujar_muro(ventana, muro)
-            if sig_nivel == True:
-                for puerta in puertas:
+            if abrir_puertas == True:
+                for puerta in puertas_sup:
                     self.dibujar_puerta_abierta(ventana, puerta)
-            if sig_nivel == False:
-                for puerta in puertas:
+                for puerta in puertas_inf:
+                    self.dibujar_puerta_abierta(ventana, puerta)
+            elif abrir_puertas == False:
+                for puerta in puertas_sup:
                     self.dibujar_puerta_cerrada(ventana, puerta)
+                for puerta in puertas_inf:
+                    self.dibujar_puerta_cerrada(ventana, puerta)
+            for lav in lava:
+                self.dibujar_lava(ventana, lav)
 
     def check_col_puerta_abierta(self, personaje, puertas):
         col_puerta = False
@@ -68,12 +105,12 @@ class Nivel():
                 col_puerta = True
                 return col_puerta
 
-    def dibujar_pantalla_transicion(self, ventana, texto1, fuente, delay):
+    def dibujar_pantalla_transicion(self, ventana, texto1, fuente, centrado_texto, delay):
         ventana.fill((0, 0, 0))
         y = 275
         for frase in texto1:
             texto = fuente.render(frase, True, (255, 255, 255))
-            ventana.blit(texto, (540, y))
+            ventana.blit(texto, (centrado_texto, y))
             y += 40
         pygame.display.update()
         pygame.time.delay(delay)

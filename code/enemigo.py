@@ -9,7 +9,7 @@ class Enemigo(Sprite):
         self.ai_settings = ai_settings
 
         #imagen Enemigo
-        self.image = pygame.image.load('enemigo_2.png')
+        self.image = pygame.image.load('./imagenes/enemigo_2.png')
 
         #rect enemigo
         self.rect = self.image.get_rect()

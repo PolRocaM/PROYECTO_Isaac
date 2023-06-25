@@ -18,7 +18,7 @@ class Settings():
         self.proyectil_height = 15
         self.proyectil_color = 255, 255, 255
         self.bullets_allowed = 20
-        self.proyectil_dmg = 100
+        self.proyectil_dmg = 20
 
         # Enemigos settings
         self.enemigo_speed_factor = 0.7

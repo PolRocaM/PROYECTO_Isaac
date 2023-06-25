@@ -6,45 +6,30 @@ from Proyectil import Proyectil
 from enemigo import Enemigo
 from nivel import Nivel
 from enemigo_tipo2 import Enemigo_tipo2
+import niveles
 
-# Inicializar
+
 pygame.init()
 
 fuente1 = pygame.font.SysFont("arial black", 24)
 fuente2 = pygame.font.SysFont("Segoe print", 32)
 
-matriz_1 = [
-    "11111111111111122111111111111111",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "10000000000000000000000000000001",
-    "11111111111111111111111111111111"
-]
+reloj = pygame.time.Clock()
+ai_settings = Settings()
+ventana = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
+pygame.display.set_caption("Proyecto PRE")
+nivel = Nivel()
+
+
+
 
 def run_game():
-
-    reloj = pygame.time.Clock()
-    ai_settings = Settings()
-    ventana = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
-    pygame.display.set_caption("Proyecto PRE")
-
-    nivel = Nivel()
-    muros = nivel.crearMuros(matriz_1)
-    puertas = nivel.crearPuertas(matriz_1)
-    siguiente_nivel = False
+    nivel_actual = 0
+    nivel_1 = nivel_2 = nivel_3 = nivel_4 = nivel_5 = False
+    abrir_puertas = False
+    enemigos_eliminados_nivel2 = False
+    enemigos_eliminados_nivel3 = False
+    enemigos_eliminados_nivel4 = False
 
     #crear personaje
     personaje = Personaje(ai_settings, ventana)
@@ -53,13 +38,29 @@ def run_game():
     # creamos grupo enemigos
     enemigos = pygame.sprite.Group()
 
+
+
     fps = 60
     jugando = True
     menu_principal=True
-    nivel_1 = False
-    nivel_2 = False
 
     while jugando:
+        if nivel_actual == 1:
+            nivel_1 = True
+        elif nivel_actual == 2:
+            nivel_2 = True
+        elif nivel_actual == 3:
+            nivel_3 = True
+        elif nivel_actual == 4:
+            nivel_4 = True
+        elif nivel_actual == 5:
+            nivel_5 = True
+
+        muros = muros_nivel(nivel, nivel_actual)
+        puertas_sup = puertas_sup_nivel(nivel, nivel_actual)
+        puertas_inf = puertas_inf_nivel(nivel, nivel_actual)
+        lava = lava_nivel(nivel, nivel_actual)
+
         while menu_principal:
             ventana.fill((255, 255, 205))
             opciones = [
@@ -81,27 +82,30 @@ def run_game():
                     if event.key == pygame.K_RETURN:
                         menu_principal = False
                         #pantalla de transición
-                        texto_nivel1 = [" nivel 1 "]
-                        nivel.dibujar_pantalla_transicion(ventana, texto_nivel1, fuente2, 3000)
-                        personaje.reset_pos()
-                        personaje.estado_inicial(enemigos)
+                        texto_nivel1 = [" Entrando en la mazmorra... "]
+                        nivel.dibujar_pantalla_transicion(ventana, texto_nivel1, fuente2,400, 3000)
+                        enemigos_eliminados_nivel2 = False
+                        enemigos_eliminados_nivel3 = False
+                        enemigos_eliminados_nivel4 = False
+                        personaje.reset_inicial()
+                        personaje.estado_inicial()
                         enemigo1 = Enemigo(ai_settings, ventana)
                         enemigo2 = Enemigo(ai_settings, ventana)
                         enemigo3 = Enemigo(ai_settings, ventana)
                         enemigos.add(enemigo1, enemigo2, enemigo3)
-                        nivel_1 = True
-
+                        nivel_actual = 1
         while nivel_1:
             # GAME OVER
             if personaje.vida == 0:
+                nivel_actual = 0
                 nivel_1 = False
                 texto_GameOver = ["GAME OVER"]
-                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 4000)
+                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 540, 5000)
                 menu_principal = True
 
             # actualizar ventana
             ventana.fill(ai_settings.bg_color)
-            nivel.dibujar_mapa(ventana, muros, puertas, siguiente_nivel)
+            nivel.dibujar_mapa(ventana, muros, puertas_sup, puertas_inf, lava, abrir_puertas)
 
             #detectar controles jugador
             Personaje.check_events(ai_settings, personaje)
@@ -137,29 +141,32 @@ def run_game():
 
             #transicio a nivel 2
             if len(enemigos) == 0:
-                siguiente_nivel = True
-                if nivel.check_col_puerta_abierta(personaje, puertas):
+                abrir_puertas = True
+                #subir de sala
+                if nivel.check_col_puerta_abierta(personaje, puertas_sup):
                     nivel_1 = False
-                    siguiente_nivel = False
-                    texto_nivel2 = ["Nivel 2"]
-                    nivel.dibujar_pantalla_transicion(ventana, texto_nivel2, fuente2, 3000)
-                    personaje.reset_pos()
-                    enemigo4 = Enemigo_tipo2(ai_settings, ventana)
-                    enemigo5 = Enemigo_tipo2(ai_settings, ventana)
-                    enemigos.add(enemigo4, enemigo5)
-                    nivel_2 = True
+                    abrir_puertas = False
+                    # texto_nivel2 = ["Nivel 2"]
+                    # nivel.dibujar_pantalla_transicion(ventana, texto_nivel2, fuente2, 540, 3000)
+                    personaje.reset_pos_sup()
+                    if enemigos_eliminados_nivel2 == False:
+                        enemigo4 = Enemigo_tipo2(ai_settings, ventana)
+                        enemigo5 = Enemigo_tipo2(ai_settings, ventana)
+                        enemigos.add(enemigo4, enemigo5)
+                    nivel_actual = 2
 
         while nivel_2:
             #GAME OVER
             if personaje.vida == 0:
+                nivel_actual = 0
                 nivel_2 = False
                 texto_GameOver = ["GAME OVER"]
-                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 5000)
+                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 540, 5000)
                 menu_principal = True
 
             # actualizar ventana
             ventana.fill(ai_settings.bg_color)
-            nivel.dibujar_mapa(ventana, muros, puertas, siguiente_nivel)
+            nivel.dibujar_mapa(ventana, muros, puertas_sup, puertas_inf, lava, abrir_puertas)
 
             # detectar controles jugador
             Personaje.check_events(ai_settings, personaje)
@@ -171,7 +178,6 @@ def run_game():
             Proyectil.update_bullets(proyectil, ai_settings, muros)
 
             # actualizamos enemigos
-            # Enemigo.update_enemigos(enemigos, personaje, ai_settings)
             enemigo4.update(personaje, enemigos, ai_settings)
             enemigo4.update_vida(ai_settings, proyectil, enemigos, personaje)
             enemigo5.update(personaje, enemigos, ai_settings)
@@ -192,15 +198,276 @@ def run_game():
             # Make the most recently drawn screen visible.
             pygame.display.flip()
 
+            # transicio a nivel 3
             if len(enemigos) == 0:
-                nivel_2 = False
-                texto_EndGame = ["Has ganado"]
-                nivel.dibujar_pantalla_transicion(ventana, texto_EndGame, fuente2, 5000)
+                enemigos_eliminados_nivel2 = True
+                abrir_puertas = True
+                # subir de sala
+                if nivel.check_col_puerta_abierta(personaje, puertas_sup):
+                    nivel_2 = False
+                    abrir_puertas = False
+                    # texto_nivel3 = ["Nivel 3"]
+                    # nivel.dibujar_pantalla_transicion(ventana, texto_nivel3, fuente2, 540, 3000)
+                    personaje.reset_pos_sup()
+                    if enemigos_eliminados_nivel3 == False:
+                        enemigo6 = Enemigo(ai_settings, ventana)
+                        enemigo7 = Enemigo_tipo2(ai_settings, ventana)
+                        enemigos.add(enemigo6, enemigo7)
+                    nivel_actual = 3
+                # bajar de sala
+                if nivel.check_col_puerta_abierta(personaje, puertas_inf):
+                    nivel_2 = False
+                    abrir_puertas = False
+                    personaje.reset_pos_inf()
+                    nivel_actual = 1
+
+        while nivel_3:
+            # GAME OVER
+            if personaje.vida == 0:
+                nivel_actual = 0
+                nivel_3 = False
+                texto_GameOver = ["GAME OVER"]
+                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 540, 5000)
                 menu_principal = True
 
+            # actualizar ventana
+            ventana.fill(ai_settings.bg_color)
+            nivel.dibujar_mapa(ventana, muros, puertas_sup, puertas_inf, lava, abrir_puertas)
+
+            # detectar controles jugador
+            Personaje.check_events(ai_settings, personaje)
+
+            # actualizamos accion del personaje
+            personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
+
+            # actualizamos proyectiles
+            Proyectil.update_bullets(proyectil, ai_settings, muros)
+
+            # actualizamos enemigos
+            enemigo6.update(personaje, enemigos, ai_settings)
+            enemigo6.update_vida(ai_settings, proyectil, enemigos, personaje)
+            enemigo7.update(personaje, enemigos, ai_settings)
+            enemigo7.update_vida(ai_settings, proyectil, enemigos, personaje)
+
+            # dibujar personaje
+            personaje.blitme()
+            personaje.draw_barra_vida(personaje.vida)
+
+            # dibuja enemigos y vida de cada enemigo
+            enemigos.draw(ventana)
+            Enemigo.update_barra_vida(enemigo6)
+            Enemigo_tipo2.update_barra_vida(enemigo7)
+
+            proyectil.draw(ventana)
+            pygame.display.update()
+            # reloj.tick(fps)
+            # Make the most recently drawn screen visible.
+            pygame.display.flip()
+
+            #transicio a nivel boss
+            if len(enemigos) == 0:
+                enemigos_eliminados_nivel3 = True
+                abrir_puertas = True
+                if nivel.check_col_puerta_abierta(personaje, puertas_sup):
+                    nivel_3 = False
+                    abrir_puertas = False
+                    # texto_nivel4 = ["Nivel 4"]
+                    # nivel.dibujar_pantalla_transicion(ventana, texto_nivel4, fuente2, 540, 3000)
+                    personaje.reset_pos_sup()
+                    if enemigos_eliminados_nivel4 == False:
+                        enemigo8 = Enemigo_tipo2(ai_settings, ventana)
+                        enemigo9 = Enemigo_tipo2(ai_settings, ventana)
+                        enemigos.add(enemigo8, enemigo9)
+                    nivel_actual = 4
+                # bajar de sala
+                if nivel.check_col_puerta_abierta(personaje, puertas_inf):
+                    nivel_3 = False
+                    abrir_puertas = False
+                    personaje.reset_pos_inf()
+                    nivel_actual = 2
+
+        while nivel_4:
+            # GAME OVER
+            if personaje.vida == 0:
+                nivel_actual = 0
+                nivel_4 = False
+                texto_GameOver = ["GAME OVER"]
+                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 540, 5000)
+                menu_principal = True
+
+            # actualizar ventana
+            ventana.fill(ai_settings.bg_color)
+            nivel.dibujar_mapa(ventana, muros, puertas_sup, puertas_inf, lava, abrir_puertas)
+
+            # detectar controles jugador
+            Personaje.check_events(ai_settings, personaje)
+
+            # actualizamos accion del personaje
+            personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
+
+            # actualizamos proyectiles
+            Proyectil.update_bullets(proyectil, ai_settings, muros)
+
+            # actualizamos enemigos
+            enemigo8.update(personaje, enemigos, ai_settings)
+            enemigo8.update_vida(ai_settings, proyectil, enemigos, personaje)
+            enemigo9.update(personaje, enemigos, ai_settings)
+            enemigo9.update_vida(ai_settings, proyectil, enemigos, personaje)
+
+            # dibujar personaje
+            personaje.blitme()
+            personaje.draw_barra_vida(personaje.vida)
+
+            # dibuja enemigos y vida de cada enemigo
+            enemigos.draw(ventana)
+            Enemigo_tipo2.update_barra_vida(enemigo8)
+            Enemigo_tipo2.update_barra_vida(enemigo9)
+
+            proyectil.draw(ventana)
+            pygame.display.update()
+            # reloj.tick(fps)
+            # Make the most recently drawn screen visible.
+            pygame.display.flip()
+
+            # transicio a nivel boss
+            if len(enemigos) == 0:
+                enemigos_eliminados_nivel4 = True
+                abrir_puertas = True
+                if nivel.check_col_puerta_abierta(personaje, puertas_sup):
+                    nivel_4 = False
+                    abrir_puertas = False
+                    # texto_nivel5 = ["Nivel 5"]
+                    # nivel.dibujar_pantalla_transicion(ventana, texto_nivel5, fuente2, 540, 3000)
+                    personaje.reset_pos_sup()
+                    enemigo10 = Enemigo_tipo2(ai_settings, ventana)
+                    # enemigo5 = Enemigo_tipo2(ai_settings, ventana)
+                    enemigos.add(enemigo10)
+                    nivel_actual = 5
+                # bajar de sala
+                if nivel.check_col_puerta_abierta(personaje, puertas_inf):
+                    nivel_4 = False
+                    abrir_puertas = False
+                    personaje.reset_pos_inf()
+                    nivel_actual = 3
+
+
+        while nivel_5:
+            # GAME OVER
+            if personaje.vida == 0:
+                nivel_actual = 0
+                nivel_5 = False
+                texto_GameOver = ["GAME OVER"]
+                nivel.dibujar_pantalla_transicion(ventana, texto_GameOver, fuente2, 540, 5000)
+                menu_principal = True
+
+            # actualizar ventana
+            ventana.fill(ai_settings.bg_color)
+            nivel.dibujar_mapa(ventana, muros, puertas_sup, puertas_inf, lava, abrir_puertas)
+
+            # detectar controles jugador
+            Personaje.check_events(ai_settings, personaje)
+
+            # actualizamos accion del personaje
+            personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
+
+            # actualizamos proyectiles
+            Proyectil.update_bullets(proyectil, ai_settings, muros)
+
+            # actualizamos enemigos
+            enemigo10.update(personaje, enemigos, ai_settings)
+            enemigo10.update_vida(ai_settings, proyectil, enemigos, personaje)
+
+
+            # dibujar personaje
+            personaje.blitme()
+            personaje.draw_barra_vida(personaje.vida)
+
+            # dibuja enemigos y vida de cada enemigo
+            enemigos.draw(ventana)
+            Enemigo_tipo2.update_barra_vida(enemigo10)
+
+            proyectil.draw(ventana)
+            pygame.display.update()
+            # reloj.tick(fps)
+            # Make the most recently drawn screen visible.
+            pygame.display.flip()
+
+            #transicio a nivel boss
+            if len(enemigos) == 0:
+                nivel_5 = False
+                texto_EndGame = ["Mazmorra succesfully cleared"]
+                nivel.dibujar_pantalla_transicion(ventana, texto_EndGame, fuente2, 350, 5000)
+                nivel_actual = 0
+                menu_principal = True
+
+def muros_nivel(nivel, nivel_actual):
+    if nivel_actual == 0 or nivel_actual == 1:
+        muros = nivel.crearMuros(niveles.matriz_1)
+        return muros
+    if nivel_actual == 2:
+        muros = nivel.crearMuros(niveles.matriz_2)
+        return muros
+    if nivel_actual == 3:
+        muros = nivel.crearMuros(niveles.matriz_3)
+        return muros
+    if nivel_actual == 4:
+        muros = nivel.crearMuros(niveles.matriz_4)
+        return muros
+    if nivel_actual == 5:
+        muros = nivel.crearMuros(niveles.matriz_5)
+        return muros
+
+def puertas_sup_nivel(nivel, nivel_actual):
+    if nivel_actual == 0 or nivel_actual == 1:
+        puertas_sup = nivel.crearPuertasSuperiores(niveles.matriz_1)
+        return puertas_sup
+    if nivel_actual == 2:
+        puertas_sup = nivel.crearPuertasSuperiores(niveles.matriz_2)
+        return puertas_sup
+    if nivel_actual == 3:
+        puertas_sup = nivel.crearPuertasSuperiores(niveles.matriz_3)
+        return puertas_sup
+    if nivel_actual == 4:
+        puertas_sup = nivel.crearPuertasSuperiores(niveles.matriz_4)
+        return puertas_sup
+    if nivel_actual == 5:
+        puertas_sup = nivel.crearPuertasSuperiores(niveles.matriz_5)
+        return puertas_sup
+
+def puertas_inf_nivel(nivel, nivel_actual):
+    if nivel_actual == 0 or nivel_actual == 1:
+        puertas_inf = nivel.crearPuertasInferiores(niveles.matriz_1)
+        return puertas_inf
+    if nivel_actual == 2:
+        puertas_inf = nivel.crearPuertasInferiores(niveles.matriz_2)
+        return puertas_inf
+    if nivel_actual == 3:
+        puertas_inf = nivel.crearPuertasInferiores(niveles.matriz_3)
+        return puertas_inf
+    if nivel_actual == 4:
+        puertas_inf = nivel.crearPuertasInferiores(niveles.matriz_4)
+        return puertas_inf
+    if nivel_actual == 5:
+        puertas_inf = nivel.crearPuertasInferiores(niveles.matriz_5)
+        return puertas_inf
+
+def lava_nivel(nivel, nivel_actual):
+    if nivel_actual == 0 or nivel_actual == 1:
+        lava = nivel.crearLava(niveles.matriz_1)
+        return lava
+    if nivel_actual == 2:
+        lava = nivel.crearLava(niveles.matriz_2)
+        return lava
+    if nivel_actual == 3:
+        lava = nivel.crearLava(niveles.matriz_3)
+        return lava
+    if nivel_actual == 4:
+        lava = nivel.crearLava(niveles.matriz_4)
+        return lava
+    if nivel_actual == 5:
+        lava = nivel.crearLava(niveles.matriz_5)
+        return lava
 
 if __name__ == '__main__':
-
     run_game()
-    # Salir
     pygame.quit()
