@@ -71,8 +71,8 @@ class Proyectil(Sprite):
 
         for bullet in proyectil:
             # # Borrar balas que se van de la pantalla
-            # if bullet.rect.bottom <= 0 or bullet.rect.top >= ai_settings.screen_height or bullet.rect.right <= 0 or bullet.rect.left >= ai_settings.screen_width:
-            #     proyectil.remove(bullet)
+            if bullet.rect.bottom <= 0 or bullet.rect.top >= ai_settings.screen_height or bullet.rect.right <= 0 or bullet.rect.left >= ai_settings.screen_width:
+                proyectil.remove(bullet)
             # borrar balas que colisionan con los muros
             for muro in muros:
                 if bullet.rect.colliderect(muro):

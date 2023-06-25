@@ -19,7 +19,7 @@ class Personaje(pygame.sprite.Sprite):
         self.rect.centerx = self.screen_rect.centerx
         self.rect.centery = self.screen_rect.centery
 
-        # Store a decimal value for the ship's center.
+        # Store a decimal value for the personaje center.
         self.centerx = float(self.rect.centerx)
         self.centery = float(self.rect.centery)
 

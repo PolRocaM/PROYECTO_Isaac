@@ -77,8 +77,10 @@ class Enemigo(Sprite):
         pygame.draw.rect(self.vida_barra, (255, 0, 0), vida_rect)
         self.ventana.blit(self.vida_barra, (self.rect.left, self.rect.bottom+3))
 
-    def update_barra_vida(enemigo):
-        enemigo.vida = enemigo.vida
-        enemigo.vida_barra = pygame.Surface((enemigo.vida*45/100, 5))
-        enemigo.draw_barra_vida_enemigo()
-
+    def update_barra_vida(self, enemigo):
+        # enemigo.vida = enemigo.vida
+        # enemigo.vida_barra = pygame.Surface((enemigo.vida*45/100, 5))
+        # enemigo.draw_barra_vida_enemigo()
+        self.vida = self.vida
+        self.vida_barra = pygame.Surface((self.vida*45/100, 5))
+        self.draw_barra_vida_enemigo()
