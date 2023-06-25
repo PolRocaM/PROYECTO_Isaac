@@ -23,9 +23,6 @@ ventana = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_
 pygame.display.set_caption("Proyecto PRE")
 nivel = Nivel()
 
-
-
-
 def run_game():
     nivel_actual = 0
     nivel_1 = nivel_2 = nivel_3 = nivel_4 = nivel_5 = False
@@ -33,6 +30,7 @@ def run_game():
     enemigos_eliminados_nivel2 = False
     enemigos_eliminados_nivel3 = False
     enemigos_eliminados_nivel4 = False
+    enemigos_eliminados_nivel5 = False
 
     #crear personaje
     personaje = Personaje(ai_settings, ventana)
@@ -50,7 +48,15 @@ def run_game():
     menu_principal=True
 
     while jugando:
-        if nivel_actual == 1:
+        if nivel_actual == 0:
+            menu_principal = True
+            pygame.mixer.music.load('./audio/Cube World Intro Menu Music.mp3')
+            pygame.mixer.music.play(-1)
+            pygame.mixer.music.set_volume(0.2)
+        elif nivel_actual == 1:
+            pygame.mixer.music.load('./audio/Hollow Knight OST.mp3')
+            pygame.mixer.music.play(-1)
+            pygame.mixer.music.set_volume(0.1)
             nivel_1 = True
         elif nivel_actual == 2:
             nivel_2 = True
@@ -86,6 +92,7 @@ def run_game():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         menu_principal = False
+                        pygame.mixer.music.stop()
                         #pantalla de transición
                         nivel.dibujar_pantalla_transicion(ventana, texto_nivel1, fuente2, 400, 3000)
                         abrir_puertas = False
@@ -97,6 +104,7 @@ def run_game():
                         for x in range(rand1):
                             enemigo = Enemigo_tipo1(ai_settings, ventana)
                             enemigos.add(enemigo)
+
                         nivel_actual = 1
         while nivel_1:
             # GAME OVER
@@ -112,12 +120,15 @@ def run_game():
 
             #detectar controles jugador
             Personaje.check_events(ai_settings, personaje)
-            personaje.recibir_danyo_lava(nivel, lava)
+            personaje.recibir_danyo_lava(ai_settings, nivel, lava)
             personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
-
 
             #actualizamos proyectiles
             Proyectil.update_bullets(proyectil, ai_settings, muros)
+
+            # dibujar personaje
+            personaje.blitme()
+            personaje.draw_barra_vida(personaje.vida)
 
             #actualizamos enemigos
             #Enemigo.update_enemigos(enemigos, personaje, ai_settings)
@@ -126,10 +137,6 @@ def run_game():
                 enemigo.update_vida(ai_settings, proyectil, enemigos, personaje)
                 enemigo.update_barra_vida(enemigo)
             enemigos.draw(ventana)
-
-            # dibujar personaje
-            personaje.blitme()
-            personaje.draw_barra_vida(personaje.vida)
 
             proyectil.draw(ventana)
 
@@ -144,8 +151,6 @@ def run_game():
                 if nivel.check_col_puerta_abierta(personaje, puertas_sup):
                     nivel_1 = False
                     abrir_puertas = False
-                    # texto_nivel2 = ["Nivel 2"]
-                    # nivel.dibujar_pantalla_transicion(ventana, texto_nivel2, fuente2, 540, 3000)
                     personaje.reset_pos_sup()
                     if enemigos_eliminados_nivel2 == False:
                         for x in range(rand2):
@@ -166,7 +171,7 @@ def run_game():
             nivel.dibujar_mapa(ventana, muros, puertas_sup, puertas_inf, lava, abrir_puertas)
 
             Personaje.check_events(ai_settings, personaje)
-            personaje.recibir_danyo_lava(nivel, lava)
+            personaje.recibir_danyo_lava(ai_settings, nivel, lava)
             personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
 
             # actualizamos proyectiles
@@ -175,8 +180,8 @@ def run_game():
             for enemigo in enemigos:
                 enemigo.update(personaje, enemigos, ai_settings)
                 enemigo.update_vida(ai_settings, proyectil, enemigos, personaje)
-                enemigos.draw(ventana)
                 enemigo.update_barra_vida(enemigo)
+            enemigos.draw(ventana)
 
             # dibujar personaje
             personaje.blitme()
@@ -196,8 +201,6 @@ def run_game():
                 if nivel.check_col_puerta_abierta(personaje, puertas_sup):
                     nivel_2 = False
                     abrir_puertas = False
-                    # texto_nivel3 = ["Nivel 3"]
-                    # nivel.dibujar_pantalla_transicion(ventana, texto_nivel3, fuente2, 540, 3000)
                     personaje.reset_pos_sup()
                     if enemigos_eliminados_nivel3 == False:
                         for x in range(rand1):
@@ -228,7 +231,7 @@ def run_game():
 
             # detectar controles jugador
             Personaje.check_events(ai_settings, personaje)
-            personaje.recibir_danyo_lava(nivel, lava)
+            personaje.recibir_danyo_lava(ai_settings, nivel, lava)
             personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
 
             # actualizamos proyectiles
@@ -237,8 +240,8 @@ def run_game():
             for enemigo in enemigos:
                 enemigo.update(personaje, enemigos, ai_settings)
                 enemigo.update_vida(ai_settings, proyectil, enemigos, personaje)
-                enemigos.draw(ventana)
                 enemigo.update_barra_vida(enemigo)
+            enemigos.draw(ventana)
 
             # dibujar personaje
             personaje.blitme()
@@ -257,8 +260,6 @@ def run_game():
                 if nivel.check_col_puerta_abierta(personaje, puertas_sup):
                     nivel_3 = False
                     abrir_puertas = False
-                    # texto_nivel4 = ["Nivel 4"]
-                    # nivel.dibujar_pantalla_transicion(ventana, texto_nivel4, fuente2, 540, 3000)
                     personaje.reset_pos_sup()
                     if enemigos_eliminados_nivel4 == False:
                         for x in range(rand3):
@@ -289,7 +290,7 @@ def run_game():
 
             # detectar controles jugador
             Personaje.check_events(ai_settings, personaje)
-            personaje.recibir_danyo_lava(nivel, lava)
+            personaje.recibir_danyo_lava(ai_settings, nivel, lava)
             personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
 
             # actualizamos proyectiles
@@ -319,10 +320,12 @@ def run_game():
                     nivel_4 = False
                     abrir_puertas = False
                     personaje.reset_pos_sup()
-
-                    enemigo = Enemigo_Boss(ai_settings, ventana)
-                    enemigos.add(enemigo)
-
+                    if enemigos_eliminados_nivel5 == False:
+                        enemigo = Enemigo_Boss(ai_settings, ventana)
+                        enemigos.add(enemigo)
+                        pygame.mixer.music.load('./audio/Godskin Apostles.mp3')
+                        pygame.mixer.music.play(-1)
+                        pygame.mixer.music.set_volume(0.1)
                     nivel_actual = 5
                 # bajar de sala
                 if nivel.check_col_puerta_abierta(personaje, puertas_inf):
@@ -346,7 +349,7 @@ def run_game():
 
             # detectar controles jugador
             Personaje.check_events(ai_settings, personaje)
-            personaje.recibir_danyo_lava(nivel, lava)
+            personaje.recibir_danyo_lava(ai_settings, nivel, lava)
             personaje.update(enemigos, ai_settings, ventana, personaje, proyectil, muros)
 
             # actualizamos proyectiles
@@ -368,13 +371,25 @@ def run_game():
             # Make the most recently drawn screen visible.
             pygame.display.flip()
 
-            #transicio a nivel boss
             if len(enemigos) == 0:
-                nivel_5 = False
-                texto_EndGame = ["Dungeon cleared successfully"]
-                nivel.dibujar_pantalla_transicion(ventana, texto_EndGame, fuente2, 400, 5000)
-                nivel_actual = 0
-                menu_principal = True
+                enemigos_eliminados_nivel5 = True
+                abrir_puertas = True
+                if nivel.check_col_puerta_abierta(personaje, puertas_sup):
+                    nivel_5 = False
+                    texto_EndGame = ["Dungeon cleared successfully"]
+                    nivel.dibujar_pantalla_transicion(ventana, texto_EndGame, fuente2, 400, 5000)
+                    nivel_actual = 0
+                    menu_principal = True
+                # bajar de sala
+                if nivel.check_col_puerta_abierta(personaje, puertas_inf):
+                    nivel_5 = False
+                    abrir_puertas = False
+                    personaje.reset_pos_inf()
+                    pygame.mixer.music.load('./audio/Hollow Knight OST.mp3')
+                    pygame.mixer.music.play(-1)
+                    pygame.mixer.music.set_volume(0.1)
+                    nivel_actual = 4
+
 
 def muros_nivel(nivel, nivel_actual):
     if nivel_actual == 0 or nivel_actual == 1:

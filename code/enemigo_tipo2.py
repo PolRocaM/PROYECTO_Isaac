@@ -1,4 +1,4 @@
-import  random
+import random
 import pygame
 from enemigo import Enemigo
 
@@ -18,14 +18,17 @@ class Enemigo_tipo2(Enemigo):
         self.rect.centerx = self.centerx
         self.rect.centery = self.centery
 
-        self.teleport = 1500
+        self.teleport = random.randrange(1000, 2000)
         self.ultimo_teleport = pygame.time.get_ticks()
+        self.sonido_tp = pygame.mixer.Sound('./audio/game-teleport-90735.mp3')
+        pygame.mixer.Sound.set_volume(self.sonido_tp, 0.1)
 
         self.vida = 150
 
     def update(self, personaje, enemigos, ai_settings):
         ahora = pygame.time.get_ticks()
         if ahora - self.ultimo_teleport > self.teleport:
+            self.sonido_tp.play()
             self.centerx = 80 + float(random.randrange(500))
             self.centery = 80 + float(random.randrange(500))
             self.rect.centerx = self.centerx

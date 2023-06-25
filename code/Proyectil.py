@@ -5,7 +5,7 @@ class Proyectil(Sprite):
     def __init__(self, ai_settings, ventana, personaje, direccion):
         super(Proyectil, self).__init__()
         self.ventana = ventana
-        self.image = pygame.image.load("./imagenes/bullet.png")
+        self.image = pygame.image.load("./imagenes/bubble.png")
 
         # Create bullet rect at (0, 0), then set correct position.
         self.rect = self.image.get_rect()
@@ -19,33 +19,34 @@ class Proyectil(Sprite):
 
         self.color = ai_settings.proyectil_color
         self.speed_factor = ai_settings.proyectil_speed_factor
-
         self.direccion = direccion
+
+
 
     def update(self):
 
         #Mover el proyectil
         if self.direccion == pygame.K_UP:
-            self.image = pygame.image.load("./imagenes/bullet_u.png")
+            # self.image = pygame.image.load("./imagenes/bullet_u.png")
             # Update the decimal position of the bullet (UP).
             self.y -= self.speed_factor
             # Update the rect position.
             self.rect.y = self.y
         elif self.direccion == pygame.K_DOWN:
-            self.image = pygame.image.load("./imagenes/bullet_d.png")
+            # self.image = pygame.image.load("./imagenes/bullet_d.png")
             # Update the decimal position of the bullet (DOWN).
             self.y += self.speed_factor
             # Update the rect position.
             self.rect.y = self.y
         elif self.direccion == pygame.K_RIGHT:
-            self.image = pygame.image.load("./imagenes/bullet_r.png")
+            # self.image = pygame.image.load("./imagenes/bullet_r.png")
             # Update the decimal position of the bullet (RIGHT).
             self.x += self.speed_factor
             # Update the rect position.
             self.rect.x = self.x
 
         elif self.direccion == pygame.K_LEFT:
-            self.image = pygame.image.load("./imagenes/bullet_l.png")
+            # self.image = pygame.image.load("./imagenes/bullet_l.png")
             # Update the decimal position of the bullet (LEFT).
             self.x -= self.speed_factor
             # Update the rect position.
@@ -59,7 +60,6 @@ class Proyectil(Sprite):
     def fire_bullet(ai_settings, ventana, personaje, proyectil, direccion):
         """Fire a bullet, if limit not reached yet."""
         # Create a new bullet, add to bullets group.
-
         if len(proyectil) < ai_settings.bullets_allowed: #limitar les bales
             new_bullet = Proyectil(ai_settings, ventana, personaje, direccion)
             proyectil.add(new_bullet)

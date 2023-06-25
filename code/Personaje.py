@@ -47,6 +47,8 @@ class Personaje(pygame.sprite.Sprite):
         self.proyectil_left = False
         self.cadencia = 300
         self.ultimo_disparo = pygame.time.get_ticks()
+        self.sonido_disp = pygame.mixer.Sound('./audio/pop-91931 (mp3cut.net).mp3')
+        pygame.mixer.Sound.set_volume(self.sonido_disp, 0.5)
 
         #dinero pj
         self.dinero = 0
@@ -192,25 +194,29 @@ class Personaje(pygame.sprite.Sprite):
             self.image = pygame.image.load('./imagenes/isaac_u.png')
             ahora = pygame.time.get_ticks()
             if ahora-self.ultimo_disparo > self.cadencia:
-                Proyectil.fire_bullet(ai_settings, ventana, personaje, proyectil, pygame.K_UP)
+                Proyectil.fire_bullet(self.ai_settings, ventana, personaje, proyectil, pygame.K_UP)
+                self.sonido_disp.play()
                 self.ultimo_disparo = ahora
         elif self.proyectil_down:
             self.image = pygame.image.load('./imagenes/isaac_d.png')
             ahora = pygame.time.get_ticks()
             if ahora - self.ultimo_disparo > self.cadencia:
-                Proyectil.fire_bullet(ai_settings, ventana, personaje, proyectil, pygame.K_DOWN)
+                Proyectil.fire_bullet(self.ai_settings, ventana, personaje, proyectil, pygame.K_DOWN)
+                self.sonido_disp.play()
                 self.ultimo_disparo = ahora
         elif self.proyectil_left:
             self.image = pygame.image.load('./imagenes/isaac_l.png')
             ahora = pygame.time.get_ticks()
             if ahora - self.ultimo_disparo > self.cadencia:
-                Proyectil.fire_bullet(ai_settings, ventana, personaje, proyectil, pygame.K_LEFT)
+                Proyectil.fire_bullet(self.ai_settings, ventana, personaje, proyectil, pygame.K_LEFT)
+                self.sonido_disp.play()
                 self.ultimo_disparo = ahora
         elif self.proyectil_right:
             self.image = pygame.image.load('./imagenes/isaac_r.png')
             ahora = pygame.time.get_ticks()
             if ahora - self.ultimo_disparo > self.cadencia:
-                Proyectil.fire_bullet(ai_settings, ventana, personaje, proyectil, pygame.K_RIGHT)
+                Proyectil.fire_bullet(self.ai_settings, ventana, personaje, proyectil, pygame.K_RIGHT)
+                self.sonido_disp.play()
                 self.ultimo_disparo = ahora
 
     def check_col_enemigo(self, enemigos):
@@ -237,11 +243,11 @@ class Personaje(pygame.sprite.Sprite):
                 elif self.moving_down:
                     self.centery -= self.ai_settings.personaje_speed_factor + 2
 
-    def recibir_danyo_lava(self, nivel, lava):
+    def recibir_danyo_lava(self, ai_settings, nivel, lava):
         if nivel.check_col_lava(self, lava):
             ahora = pygame.time.get_ticks()
             if ahora - self.last_hit > self.invulnerable:
-                self.vida -= 5
+                self.vida -= ai_settings.dmg_lava
                 if self.vida < 0:
                     self.vida = 0
                 self.last_hit = ahora

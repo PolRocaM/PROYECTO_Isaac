@@ -41,7 +41,6 @@ class Enemigo(Sprite):
 
         colisiones = pygame.sprite.groupcollide(enemigos, proyectil, False, True)
         for enemigos, proyectiles in colisiones.items():
-            # print (enemigos, proyectiles)
             for i in proyectiles:
                 enemigos.vida -= ai_settings.proyectil_dmg
                 if enemigos.vida <= 0:

@@ -34,6 +34,7 @@ class Enemigo_Boss(Enemigo):
         self.vida_barra = pygame.Surface((self.vida * 70 / 100, 50))
         self.vida_barra.fill((255, 0, 0))
 
+        self.ai_settings.dmg_enemigo = 25
 
     def update(self, personaje, enemigos, ai_settings):
         dx = personaje.rect.centerx - self.centerx
@@ -49,6 +50,7 @@ class Enemigo_Boss(Enemigo):
             self.centery += dy * self.ai_settings.boss_speed_factor
         self.rect.centerx = self.centerx
         self.rect.centery = self.centery
+
         # ahora = pygame.time.get_ticks()
         # if ahora - self.ultimo_teleport > self.teleport:
         #     self.centerx = 80 + float(random.randrange(500))
