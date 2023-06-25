@@ -23,7 +23,17 @@ class Enemigo_Boss(Enemigo):
         self.teleport = 1500
         self.ultimo_teleport = pygame.time.get_ticks()
 
+        # parametros vida enemigo
+        self.health_font = pygame.font.SysFont('Roboto', 18)
+        self.largo = 500
+        self.ancho = 25
         self.vida = 500
+        # barra de vida total
+        self.vida_barra_max = pygame.Surface((self.largo, self.ancho))
+        self.vida_barra_max.fill((0, 0, 0))
+        self.vida_barra = pygame.Surface((self.vida * 70 / 100, 50))
+        self.vida_barra.fill((255, 0, 0))
+
 
     def update(self, personaje, enemigos, ai_settings):
         dx = personaje.rect.centerx - self.centerx
@@ -46,3 +56,19 @@ class Enemigo_Boss(Enemigo):
         #     self.rect.centerx = self.centerx
         #     self.rect.centery = self.centery
         #     self.ultimo_teleport = ahora
+
+    def draw_barra_vida_enemigo(self):
+        calculo_largo = int(self.vida)
+        self.vida_barra = pygame.Surface((calculo_largo, self.ancho))
+        borde = pygame.Rect(0, 0, self.largo, self.ancho)
+        rectangulo = pygame.Rect(0, 0, calculo_largo, self.ancho)
+        pygame.draw.rect(self.vida_barra_max, (0, 0, 0), borde)
+        pygame.draw.rect(self.vida_barra, (255, 0, 0), rectangulo)
+        self.ventana.blit(self.vida_barra_max, (self.ventana_rect.left + 390, self.ventana_rect.bottom - 120))
+        self.ventana.blit(self.vida_barra, (self.ventana_rect.left + 390, self.ventana_rect.bottom - 120))
+        self.ventana.blit(pygame.image.load('./imagenes/marco_health_boss.png'), (self.ventana_rect.left + 375, self.ventana_rect.bottom - 130))
+
+    def update_barra_vida(self, enemigo):
+        self.vida = self.vida
+        self.vida_barra = pygame.Surface((self.vida*200/100, 25))
+        self.draw_barra_vida_enemigo()

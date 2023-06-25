@@ -35,28 +35,7 @@ class Enemigo(Sprite):
         self.vida_barra.fill((255, 0, 0))
 
     def update(self, personaje, enemigos, ai_settings):
-        #moviment enemigo
-        self.centerx += self.ai_settings.enemigo_speed_factor*self.dir
-        self.rect.centerx = self.centerx
-        self.centery += self.ai_settings.enemigo_speed_factor*self.dir2
-        self.rect.centery = self.centery
-
-        #limites pantalla y cambio de dirección
-        if self.rect.right > self.ai_settings.screen_width-40:
-            self.dir = -1.0
-        if self.rect.left < 40:
-            self.dir = 1.0
-        if self.rect.bottom > self.ai_settings.screen_height-40:
-            self.dir2 = -1.0
-        if self.rect.top < 40:
-            self.dir2 = 1.0
-        # if self.rect == personaje.rect.centery-25:
-        #     self.dir2 = self.dir2 *-1
-        # if self.rect == (personaje.rect.centerx)-25:
-        #     self.dir = self.dir*-1
-        # self.centery = self.centery
-        # self.centerx = self.centerx
-
+        pass
 
     def update_vida(self, ai_settings, proyectil, enemigos, personaje):
 

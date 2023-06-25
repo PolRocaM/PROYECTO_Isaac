@@ -1,6 +1,5 @@
 import  random
 import pygame
-from pygame.sprite import Sprite
 from enemigo import Enemigo
 
 class Enemigo_tipo2(Enemigo):
@@ -32,3 +31,15 @@ class Enemigo_tipo2(Enemigo):
             self.rect.centerx = self.centerx
             self.rect.centery = self.centery
             self.ultimo_teleport = ahora
+
+    def update_vida(self, ai_settings, proyectil, enemigos, personaje):
+        colisiones = pygame.sprite.groupcollide(enemigos, proyectil, False, True)
+        for enemigos, proyectiles in colisiones.items():
+            # print (enemigos, proyectiles)
+            for i in proyectiles:
+                enemigos.vida -= ai_settings.proyectil_dmg
+                if enemigos.vida <= 0:
+                    enemigos.vida = 0
+                    enemigos.kill()
+                    personaje.dinero += 25
+                    print(personaje.dinero)

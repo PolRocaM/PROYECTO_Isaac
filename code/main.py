@@ -1,15 +1,15 @@
 import random
 import sys
 import pygame
+from nivel import Nivel
 from Personaje import Personaje
 from settings import Settings
 from Proyectil import Proyectil
 from enemigo import Enemigo
-from nivel import Nivel
+from enemigo_tipo1 import Enemigo_tipo1
 from enemigo_tipo2 import Enemigo_tipo2
 from enemigoBoss import Enemigo_Boss
 import niveles
-
 
 pygame.init()
 
@@ -95,7 +95,7 @@ def run_game():
                         personaje.reset_inicial(enemigos)
                         personaje.estado_inicial()
                         for x in range(rand1):
-                            enemigo = Enemigo(ai_settings, ventana)
+                            enemigo = Enemigo_tipo1(ai_settings, ventana)
                             enemigos.add(enemigo)
                         nivel_actual = 1
         while nivel_1:
@@ -124,8 +124,8 @@ def run_game():
             for enemigo in enemigos:
                 enemigo.update(personaje, enemigos, ai_settings)
                 enemigo.update_vida(ai_settings, proyectil, enemigos, personaje)
-                enemigos.draw(ventana)
                 enemigo.update_barra_vida(enemigo)
+            enemigos.draw(ventana)
 
             # dibujar personaje
             personaje.blitme()
@@ -200,11 +200,11 @@ def run_game():
                     # nivel.dibujar_pantalla_transicion(ventana, texto_nivel3, fuente2, 540, 3000)
                     personaje.reset_pos_sup()
                     if enemigos_eliminados_nivel3 == False:
-                        for x in range(rand3):
-                            enemigo = Enemigo_tipo2(ai_settings, ventana)
+                        for x in range(rand1):
+                            enemigo = Enemigo_tipo1(ai_settings, ventana)
                             enemigos.add(enemigo)
-                        for y in range(rand1):
-                            enemigo = Enemigo(ai_settings, ventana)
+                        for y in range(rand3):
+                            enemigo = Enemigo_tipo2(ai_settings, ventana)
                             enemigos.add(enemigo)
                     nivel_actual = 3
                 # bajar de sala
@@ -262,10 +262,10 @@ def run_game():
                     personaje.reset_pos_sup()
                     if enemigos_eliminados_nivel4 == False:
                         for x in range(rand3):
-                            enemigo = Enemigo_tipo2(ai_settings, ventana)
+                            enemigo = Enemigo_tipo1(ai_settings, ventana)
                             enemigos.add(enemigo)
                         for y in range(rand3):
-                            enemigo = Enemigo(ai_settings, ventana)
+                            enemigo = Enemigo_tipo2(ai_settings, ventana)
                             enemigos.add(enemigo)
                     nivel_actual = 4
                 # bajar de sala
@@ -298,8 +298,8 @@ def run_game():
             for enemigo in enemigos:
                 enemigo.update(personaje, enemigos, ai_settings)
                 enemigo.update_vida(ai_settings, proyectil, enemigos, personaje)
-                enemigos.draw(ventana)
                 enemigo.update_barra_vida(enemigo)
+            enemigos.draw(ventana)
 
             # dibujar personaje
             personaje.blitme()
@@ -319,7 +319,7 @@ def run_game():
                     nivel_4 = False
                     abrir_puertas = False
                     personaje.reset_pos_sup()
-                    
+
                     enemigo = Enemigo_Boss(ai_settings, ventana)
                     enemigos.add(enemigo)
 
@@ -352,15 +352,15 @@ def run_game():
             # actualizamos proyectiles
             Proyectil.update_bullets(proyectil, ai_settings, muros)
 
-            for enemigo in enemigos:
-                enemigo.update(personaje, enemigos, ai_settings)
-                enemigo.update_vida(ai_settings, proyectil, enemigos, personaje)
-                enemigos.draw(ventana)
-                enemigo.update_barra_vida(enemigo)
-
             # dibujar personaje
             personaje.blitme()
             personaje.draw_barra_vida(personaje.vida)
+
+            for enemigo in enemigos:
+                enemigo.update(personaje, enemigos, ai_settings)
+                enemigo.update_vida(ai_settings, proyectil, enemigos, personaje)
+                enemigo.update_barra_vida(enemigo)
+            enemigos.draw(ventana)
 
             proyectil.draw(ventana)
             pygame.display.update()
