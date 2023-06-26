@@ -31,6 +31,11 @@ def run_game():
     enemigos_eliminados_nivel3 = False
     enemigos_eliminados_nivel4 = False
     enemigos_eliminados_nivel5 = False
+    sonido_puerta_1 = False
+    sonido_puerta_2 = False
+    sonido_puerta_3 = False
+    sonido_puerta_4 = False
+    sonido_puerta_5 = False
 
     #crear personaje
     personaje = Personaje(ai_settings, ventana)
@@ -99,12 +104,12 @@ def run_game():
                         enemigos_eliminados_nivel2 = False
                         enemigos_eliminados_nivel3 = False
                         enemigos_eliminados_nivel4 = False
+                        sonido_puerta_done = False
                         personaje.reset_inicial(enemigos)
                         personaje.estado_inicial()
                         for x in range(rand1):
                             enemigo = Enemigo_tipo1(ai_settings, ventana)
                             enemigos.add(enemigo)
-
                         nivel_actual = 1
         while nivel_1:
             # GAME OVER
@@ -146,6 +151,9 @@ def run_game():
 
             #transicio a nivel 2
             if len(enemigos) == 0:
+                if sonido_puerta_1 == False:
+                    nivel.sonido_puertas.play()
+                    sonido_puerta_1 = True
                 abrir_puertas = True
                 #subir de sala
                 if nivel.check_col_puerta_abierta(personaje, puertas_sup):
@@ -156,7 +164,7 @@ def run_game():
                         for x in range(rand2):
                             enemigo = Enemigo_tipo2(ai_settings, ventana)
                             enemigos.add(enemigo)
-                    nivel_actual = 2
+                    nivel_actual += 1
 
         while nivel_2:
             #GAME OVER
@@ -195,6 +203,9 @@ def run_game():
 
             # transicio a nivel 3
             if len(enemigos) == 0:
+                if sonido_puerta_2 == False:
+                    nivel.sonido_puertas.play()
+                    sonido_puerta_2 = True
                 enemigos_eliminados_nivel2 = True
                 abrir_puertas = True
                 # subir de sala
@@ -209,13 +220,13 @@ def run_game():
                         for y in range(rand3):
                             enemigo = Enemigo_tipo2(ai_settings, ventana)
                             enemigos.add(enemigo)
-                    nivel_actual = 3
+                    nivel_actual += 1
                 # bajar de sala
                 if nivel.check_col_puerta_abierta(personaje, puertas_inf):
                     nivel_2 = False
                     abrir_puertas = False
                     personaje.reset_pos_inf()
-                    nivel_actual = 1
+                    nivel_actual -= 1
 
         while nivel_3:
             # GAME OVER
@@ -255,6 +266,9 @@ def run_game():
 
             #transicio a nivel boss
             if len(enemigos) == 0:
+                if sonido_puerta_3 == False:
+                    nivel.sonido_puertas.play()
+                    sonido_puerta_3 = True
                 enemigos_eliminados_nivel3 = True
                 abrir_puertas = True
                 if nivel.check_col_puerta_abierta(personaje, puertas_sup):
@@ -268,13 +282,13 @@ def run_game():
                         for y in range(rand3):
                             enemigo = Enemigo_tipo2(ai_settings, ventana)
                             enemigos.add(enemigo)
-                    nivel_actual = 4
+                    nivel_actual += 1
                 # bajar de sala
                 if nivel.check_col_puerta_abierta(personaje, puertas_inf):
                     nivel_3 = False
                     abrir_puertas = False
                     personaje.reset_pos_inf()
-                    nivel_actual = 2
+                    nivel_actual -= 1
 
         while nivel_4:
             # GAME OVER
@@ -314,6 +328,9 @@ def run_game():
 
             # transicio a nivel boss
             if len(enemigos) == 0:
+                if sonido_puerta_4 == False:
+                    nivel.sonido_puertas.play()
+                    sonido_puerta_4 = True
                 enemigos_eliminados_nivel4 = True
                 abrir_puertas = True
                 if nivel.check_col_puerta_abierta(personaje, puertas_sup):
@@ -326,13 +343,13 @@ def run_game():
                         pygame.mixer.music.load('./audio/Godskin Apostles.mp3')
                         pygame.mixer.music.play(-1)
                         pygame.mixer.music.set_volume(0.1)
-                    nivel_actual = 5
+                    nivel_actual += 1
                 # bajar de sala
                 if nivel.check_col_puerta_abierta(personaje, puertas_inf):
                     nivel_4 = False
                     abrir_puertas = False
                     personaje.reset_pos_inf()
-                    nivel_actual = 3
+                    nivel_actual -= 1
 
 
         while nivel_5:
@@ -372,6 +389,9 @@ def run_game():
             pygame.display.flip()
 
             if len(enemigos) == 0:
+                if sonido_puerta_5 == False:
+                    nivel.sonido_puertas.play()
+                    sonido_puerta_5 = True
                 enemigos_eliminados_nivel5 = True
                 abrir_puertas = True
                 if nivel.check_col_puerta_abierta(personaje, puertas_sup):
@@ -380,7 +400,6 @@ def run_game():
                     nivel.dibujar_pantalla_transicion(ventana, texto_EndGame, fuente2, 400, 5000)
                     nivel_actual = 0
                     menu_principal = True
-                # bajar de sala
                 if nivel.check_col_puerta_abierta(personaje, puertas_inf):
                     nivel_5 = False
                     abrir_puertas = False
@@ -388,7 +407,7 @@ def run_game():
                     pygame.mixer.music.load('./audio/Hollow Knight OST.mp3')
                     pygame.mixer.music.play(-1)
                     pygame.mixer.music.set_volume(0.1)
-                    nivel_actual = 4
+                    nivel_actual -= 1
 
 
 def muros_nivel(nivel, nivel_actual):

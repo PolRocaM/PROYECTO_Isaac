@@ -40,6 +40,8 @@ class Personaje(pygame.sprite.Sprite):
         #barra de vida actual
         self.vida_barra = pygame.Surface((int((self.vida/100)*self.largo), self.ancho))
         self.vida_barra.fill((125, 125, 125))
+        self.sonido_hurt = pygame.mixer.Sound('./audio/hurt_c_08-102842.mp3')
+        pygame.mixer.Sound.set_volume(self.sonido_hurt, 0.5)
 
         self.proyectil_up = False
         self.proyectil_down = False
@@ -153,7 +155,7 @@ class Personaje(pygame.sprite.Sprite):
 
         # pos inicial del personaje en el centro de la pantalla
         self.centerx = float(self.screen_rect.centerx)
-        self.centery = float(100)
+        self.centery = float(120)
 
     def estado_inicial(self): # resetear stats iniciales
 
@@ -226,6 +228,7 @@ class Personaje(pygame.sprite.Sprite):
             ahora = pygame.time.get_ticks()
             if ahora - self.last_hit > self.invulnerable:
                 self.vida -= self.ai_settings.dmg_enemigo
+                self.sonido_hurt.play()
                 if self.vida <= 0:
                     self.vida = 0
                     self.kill()
@@ -248,6 +251,7 @@ class Personaje(pygame.sprite.Sprite):
             ahora = pygame.time.get_ticks()
             if ahora - self.last_hit > self.invulnerable:
                 self.vida -= ai_settings.dmg_lava
+                self.sonido_hurt.play()
                 if self.vida < 0:
                     self.vida = 0
                 self.last_hit = ahora

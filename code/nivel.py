@@ -18,6 +18,9 @@ class Nivel():
         self.imagen_lava = pygame.image.load("./imagenes/lava_1.png").convert()
         self.imagen_lava_redimensionada = pygame.transform.scale(self.imagen_lava, (40, 40))
 
+        self.sonido_puertas = pygame.mixer.Sound('./audio/dooropened-103851.mp3')
+        pygame.mixer.Sound.set_volume(self.sonido_puertas, 0.5)
+
     def crearMuros(self, matriz):
         muros = []
         x = 0
