@@ -15,6 +15,7 @@ pygame.init()
 
 fuente1 = pygame.font.SysFont("arial black", 24)
 fuente2 = pygame.font.SysFont("Segoe print", 32)
+opciones = ["new game <Press enter>"]
 texto_nivel1 = [" Entering the dungeon... "]
 texto_GameOver = ["GAME OVER"]
 reloj = pygame.time.Clock()
@@ -41,6 +42,7 @@ def run_game():
     personaje = Personaje(ai_settings, ventana)
     #creamos grupo proyectiles
     proyectil = pygame.sprite.Group()
+    proyectil_e = pygame.sprite.Group()
     # creamos grupo enemigos
     enemigos = pygame.sprite.Group()
 
@@ -79,14 +81,10 @@ def run_game():
 
         while menu_principal:
             ventana.fill((255, 255, 205))
-            opciones = [
-                "new game <Press enter>",
-                "Exit"
-            ]
-            y = 100
+            y = 275
             for frase in opciones:
                 texto = fuente2.render(frase, True, (0, 0, 0))
-                ventana.blit(texto, (150, y))
+                ventana.blit(texto, (400, y))
                 y += 40
             pygame.display.update()
 
@@ -140,16 +138,14 @@ def run_game():
             personaje.draw_barra_vida(personaje.vida)
 
             #actualizamos enemigos
-            #Enemigo.update_enemigos(enemigos, personaje, ai_settings)
             for enemigo in enemigos:
                 enemigo.update(personaje, enemigos, ai_settings)
                 enemigo.update_vida(ai_settings, proyectil, enemigos, personaje)
-                enemigo.update_barra_vida(enemigo)
+                enemigo.update_barra_vida()
             enemigos.draw(ventana)
 
             proyectil.draw(ventana)
 
-            # reloj.tick(fps)
             pygame.display.update()
             pygame.display.flip() # Make the most recently drawn screen visible.
 
@@ -192,7 +188,7 @@ def run_game():
             for enemigo in enemigos:
                 enemigo.update(personaje, enemigos, ai_settings)
                 enemigo.update_vida(ai_settings, proyectil, enemigos, personaje)
-                enemigo.update_barra_vida(enemigo)
+                enemigo.update_barra_vida()
             enemigos.draw(ventana)
 
             # dibujar personaje
@@ -201,8 +197,6 @@ def run_game():
 
             proyectil.draw(ventana)
             pygame.display.update()
-            # reloj.tick(fps)
-            # Make the most recently drawn screen visible.
             pygame.display.flip()
 
             # transicio a nivel 3
@@ -255,7 +249,7 @@ def run_game():
             for enemigo in enemigos:
                 enemigo.update(personaje, enemigos, ai_settings)
                 enemigo.update_vida(ai_settings, proyectil, enemigos, personaje)
-                enemigo.update_barra_vida(enemigo)
+                enemigo.update_barra_vida()
             enemigos.draw(ventana)
 
             # dibujar personaje
@@ -264,8 +258,6 @@ def run_game():
 
             proyectil.draw(ventana)
             pygame.display.update()
-            # reloj.tick(fps)
-            # Make the most recently drawn screen visible.
             pygame.display.flip()
 
             #transicio a nivel boss
@@ -317,7 +309,7 @@ def run_game():
             for enemigo in enemigos:
                 enemigo.update(personaje, enemigos, ai_settings)
                 enemigo.update_vida(ai_settings, proyectil, enemigos, personaje)
-                enemigo.update_barra_vida(enemigo)
+                enemigo.update_barra_vida()
             enemigos.draw(ventana)
 
             # dibujar personaje
@@ -326,8 +318,6 @@ def run_game():
 
             proyectil.draw(ventana)
             pygame.display.update()
-            # reloj.tick(fps)
-            # Make the most recently drawn screen visible.
             pygame.display.flip()
 
             # transicio a nivel boss
@@ -342,8 +332,11 @@ def run_game():
                     abrir_puertas = False
                     personaje.reset_pos_sup()
                     if enemigos_eliminados_nivel5 == False:
-                        enemigo = Enemigo_Boss(ai_settings, ventana)
-                        enemigos.add(enemigo)
+                        for x in range(3):
+                            enemigo = Enemigo_tipo2(ai_settings, ventana)
+                            enemigos.add(enemigo)
+                        Boss = Enemigo_Boss(ai_settings, ventana)
+                        enemigos.add(Boss)
                         pygame.mixer.music.load('./audio/Godskin Apostles.mp3')
                         pygame.mixer.music.play(-1)
                         pygame.mixer.music.set_volume(0.1)
@@ -354,7 +347,6 @@ def run_game():
                     abrir_puertas = False
                     personaje.reset_pos_inf()
                     nivel_actual -= 1
-
 
         while nivel_5:
             # GAME OVER
@@ -383,13 +375,12 @@ def run_game():
             for enemigo in enemigos:
                 enemigo.update(personaje, enemigos, ai_settings)
                 enemigo.update_vida(ai_settings, proyectil, enemigos, personaje)
-                enemigo.update_barra_vida(enemigo)
+                enemigo.update_barra_vida()
             enemigos.draw(ventana)
 
             proyectil.draw(ventana)
+
             pygame.display.update()
-            # reloj.tick(fps)
-            # Make the most recently drawn screen visible.
             pygame.display.flip()
 
             if len(enemigos) == 0:
@@ -412,7 +403,6 @@ def run_game():
                     pygame.mixer.music.play(-1)
                     pygame.mixer.music.set_volume(0.1)
                     nivel_actual -= 1
-
 
 def muros_nivel(nivel, nivel_actual):
     if nivel_actual == 0 or nivel_actual == 1:

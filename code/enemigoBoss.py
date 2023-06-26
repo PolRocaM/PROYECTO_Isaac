@@ -1,7 +1,8 @@
-import  random
+import random
 import pygame
 import math
 from enemigo import Enemigo
+from Proyectil import *
 
 class Enemigo_Boss(Enemigo):
     def __init__(self, ai_settings, ventana):
@@ -35,29 +36,26 @@ class Enemigo_Boss(Enemigo):
         self.vida_barra.fill((255, 0, 0))
 
         self.ai_settings.dmg_enemigo = 25
+        self.disparo = 1500
+        self.ultimo_disparo = pygame.time.get_ticks()
+        self.dx = 0
+        self.dy = 0
 
-    def update(self, personaje, enemigos, ai_settings):
-        dx = personaje.rect.centerx - self.centerx
-        dy = personaje.rect.centery - self.centery
-        distancia = math.sqrt(dx ** 2 + dy ** 2)
+    def update(self, personaje, enemigo, ai_settings):
+        self.dx = personaje.rect.centerx - self.centerx
+        self.dy = personaje.rect.centery - self.centery
+        distancia = math.sqrt(self.dx ** 2 + self.dy ** 2)
         if distancia > 0:
             # Normalizar el vector de dirección
-            dx = dx / distancia
-            dy = dy / distancia
+            self.dx = self.dx / distancia
+            self.dy = self.dy / distancia
 
             # Mover el enemigo en la dirección del jugador
-            self.centerx += dx * self.ai_settings.boss_speed_factor
-            self.centery += dy * self.ai_settings.boss_speed_factor
+            self.centerx += self.dx * self.ai_settings.boss_speed_factor
+            self.centery += self.dy * self.ai_settings.boss_speed_factor
         self.rect.centerx = self.centerx
         self.rect.centery = self.centery
 
-        # ahora = pygame.time.get_ticks()
-        # if ahora - self.ultimo_teleport > self.teleport:
-        #     self.centerx = 80 + float(random.randrange(500))
-        #     self.centery = 80 + float(random.randrange(500))
-        #     self.rect.centerx = self.centerx
-        #     self.rect.centery = self.centery
-        #     self.ultimo_teleport = ahora
 
     def draw_barra_vida_enemigo(self):
         calculo_largo = int(self.vida)
@@ -70,7 +68,7 @@ class Enemigo_Boss(Enemigo):
         self.ventana.blit(self.vida_barra, (self.ventana_rect.left + 390, self.ventana_rect.bottom - 120))
         self.ventana.blit(pygame.image.load('./imagenes/marco_health_boss.png'), (self.ventana_rect.left + 375, self.ventana_rect.bottom - 130))
 
-    def update_barra_vida(self, enemigo):
+    def update_barra_vida(self):
         self.vida = self.vida
         self.vida_barra = pygame.Surface((self.vida*200/100, 25))
         self.draw_barra_vida_enemigo()

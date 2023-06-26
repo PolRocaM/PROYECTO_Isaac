@@ -21,8 +21,8 @@ class Enemigo(Sprite):
         self.rect.centerx = self.centerx
         self.rect.centery = self.centery
 
-        self.dir = -1 #parametro para cambiar la dirección x
-        self.dir2 = -1 #parametro para cambiar la dirección y
+        self.dir = -1  # parametro para cambiar la dirección x
+        self.dir2 = -1  # parametro para cambiar la dirección y
 
         #guardar numero float del centro del enemigo
         self.centerx = float(self.rect.centerx)
@@ -38,7 +38,6 @@ class Enemigo(Sprite):
         pass
 
     def update_vida(self, ai_settings, proyectil, enemigos, personaje):
-
         colisiones = pygame.sprite.groupcollide(enemigos, proyectil, False, True)
         for enemigos, proyectiles in colisiones.items():
             for i in proyectiles:
@@ -55,10 +54,7 @@ class Enemigo(Sprite):
         pygame.draw.rect(self.vida_barra, (255, 0, 0), vida_rect)
         self.ventana.blit(self.vida_barra, (self.rect.left, self.rect.bottom+3))
 
-    def update_barra_vida(self, enemigo):
-        # enemigo.vida = enemigo.vida
-        # enemigo.vida_barra = pygame.Surface((enemigo.vida*45/100, 5))
-        # enemigo.draw_barra_vida_enemigo()
+    def update_barra_vida(self):
         self.vida = self.vida
         self.vida_barra = pygame.Surface((self.vida*45/100, 5))
         self.draw_barra_vida_enemigo()
