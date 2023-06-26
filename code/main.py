@@ -104,7 +104,11 @@ def run_game():
                         enemigos_eliminados_nivel2 = False
                         enemigos_eliminados_nivel3 = False
                         enemigos_eliminados_nivel4 = False
-                        sonido_puerta_done = False
+                        sonido_puerta_1 = False
+                        sonido_puerta_2 = False
+                        sonido_puerta_3 = False
+                        sonido_puerta_4 = False
+                        sonido_puerta_5 = False
                         personaje.reset_inicial(enemigos)
                         personaje.estado_inicial()
                         for x in range(rand1):
